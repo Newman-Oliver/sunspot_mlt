@@ -1,0 +1,8 @@
+*.ini
+.idea/
+__pycache__/
+.mypy_cache/
+venv/
+env/
+venv3.7/
+temp_*
