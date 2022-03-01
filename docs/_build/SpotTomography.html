@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>SpotTomography module &#8212; Sunspot MLT 2022-03-01 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-SpotTomography">
+<span id="spottomography-module"></span><h1>SpotTomography module<a class="headerlink" href="#module-SpotTomography" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotTomography.Tomography">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotTomography.</span></span><span class="sig-name descname"><span class="pre">Tomography</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_thresholds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_path_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_sunspot_group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OPTICS_eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OPTICS_minPts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTomography.Tomography" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotTomography.Tomography.applyOPTICS">
+<span class="sig-name descname"><span class="pre">applyOPTICS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minPts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTomography.Tomography.applyOPTICS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the OPTICS clustering algorithm to the data and return the resulting clusters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotTomography.Tomography.extractData">
+<span class="sig-name descname"><span class="pre">extractData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTomography.Tomography.extractData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a list of the points that contain data and their co-ordinates for passing into the OPTICS code</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotTomography.Tomography.getClustersFromROIs">
+<span class="sig-name descname"><span class="pre">getClustersFromROIs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotTomography.Tomography.getClustersFromROIs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotTomography.Tomography.getPerimeters">
+<span class="sig-name descname"><span class="pre">getPerimeters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tomo_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tomo_clusters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTomography.Tomography.getPerimeters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotTomography.Tomography.plotFigure">
+<span class="sig-name descname"><span class="pre">plotFigure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tomo_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tomo_clusters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_perims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTomography.Tomography.plotFigure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Sunspot MLT</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Richard Grimes.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/SpotTomography.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

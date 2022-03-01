@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>MLT module &#8212; Sunspot MLT 2022-03-01 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-MLT">
+<span id="mlt-module"></span><h1>MLT module<a class="headerlink" href="#module-MLT" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">MLT.</span></span><span class="sig-name descname"><span class="pre">MultiLevelThresholding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_path_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_config_parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_min_pts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding.apply_optics">
+<span class="sig-name descname"><span class="pre">apply_optics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_pts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding.apply_optics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the OPTICS clustering algorithm to the data and return the resulting clusters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding.calculate_pixel_weight">
+<span class="sig-name descname"><span class="pre">calculate_pixel_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pixel_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighting_threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding.calculate_pixel_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of times a pixel value must be repeated to provide a weighting such that lower intensity
+pixels have a  higher weight.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding.do_ellipse_fit">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">do_ellipse_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding.do_ellipse_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding.extract_data">
+<span class="sig-name descname"><span class="pre">extract_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_weighting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding.extract_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a list of the points that contain data and their co-ordinates for passing into the OPTICS code</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding.fit_ellipse">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit_ellipse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_perimeter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_perimeter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding.fit_ellipse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit an ellipse to a group of x and y coordinates. Returns 3 values: the ellipse parameters in a list [centre,
+axes, angle to normal], the x coords of the ellipse, the y coords of the ellipse.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding.make_layer">
+<span class="sig-name descname"><span class="pre">make_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding.make_layer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a layer by applying a thresholding to the data and finding the clusters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding.plot_layers">
+<span class="sig-name descname"><span class="pre">plot_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding.plot_layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a plot of the clusters and save it to a file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding.pretty_plot">
+<span class="sig-name descname"><span class="pre">pretty_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding.pretty_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Debug code for plotting the clusters in each layer. Used to track down an issue in clustering but also good
+for visualisation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding.run_thresholding_on_list">
+<span class="sig-name descname"><span class="pre">run_thresholding_on_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spot_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_threshold_ratios</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding.run_thresholding_on_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the MLT process on a list of sunspot groups.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MLT.MultiLevelThresholding.run_thresholding_on_roi">
+<span class="sig-name descname"><span class="pre">run_thresholding_on_roi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MLT.MultiLevelThresholding.run_thresholding_on_roi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the MLT process for a single ROI image</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Sunspot MLT</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Richard Grimes.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/MLT.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

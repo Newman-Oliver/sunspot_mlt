@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>hacky_download module &#8212; Sunspot MLT 2022-03-01 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-hacky_download">
+<span id="hacky-download-module"></span><h1>hacky_download module<a class="headerlink" href="#module-hacky_download" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="hacky_download.brute_force_download">
+<span class="sig-prename descclassname"><span class="pre">hacky_download.</span></span><span class="sig-name descname"><span class="pre">brute_force_download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hacky_download.brute_force_download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repeats the download command multiple times to get as many files as possible.
+Args:</p>
+<blockquote>
+<div><p>search_result:
+path:
+retries:</p>
+</div></blockquote>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hacky_download.download">
+<span class="sig-prename descclassname"><span class="pre">hacky_download.</span></span><span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hacky_download.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts downloading data. Blocking function.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hacky_download.extract_unified_response_date">
+<span class="sig-prename descclassname"><span class="pre">hacky_download.</span></span><span class="sig-name descname"><span class="pre">extract_unified_response_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unified_response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hacky_download.extract_unified_response_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the date from each entry in a unified response so that it can be saved to the disk with json.</p>
+<p>I don’t understand how the unified response object is structured and it can’t be saved to disk, so I’m
+converting each row of the table to a string and extracting the relevent substring that contains the date.
+I don’t like having to do this, and I don’t like that it works.
+Args:</p>
+<blockquote>
+<div><p>unified_response:</p>
+</div></blockquote>
+<p>Returns: list&lt;str&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hacky_download.log">
+<span class="sig-prename descclassname"><span class="pre">hacky_download.</span></span><span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hacky_download.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends a timestamp to log messages</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hacky_download.search">
+<span class="sig-prename descclassname"><span class="pre">hacky_download.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phys_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadence</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hacky_download.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Searches solar data using VSO parameters, returns the result query</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Sunspot MLT</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Richard Grimes.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/hacky_download.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

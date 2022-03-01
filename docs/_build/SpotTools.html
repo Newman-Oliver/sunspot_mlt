@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>SpotTools module &#8212; Sunspot MLT 2022-03-01 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-SpotTools">
+<span id="spottools-module"></span><h1>SpotTools module<a class="headerlink" href="#module-SpotTools" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotTools.MplColorHelper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">MplColorHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmap_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.MplColorHelper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Used to get a colour from a colour map. Instantiates a copy of the map with the given min and max values and
+provides a colour for a given value (val) between the min and max.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotTools.MplColorHelper.get_discrete_list">
+<span class="sig-name descname"><span class="pre">get_discrete_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colour_count</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.MplColorHelper.get_discrete_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of colour_count length of evenly spaced colours from the colour map</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotTools.MplColorHelper.get_rgb">
+<span class="sig-name descname"><span class="pre">get_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.MplColorHelper.get_rgb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.bresenhamHigh">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">bresenhamHigh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.bresenhamHigh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.bresenhamLow">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">bresenhamLow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.bresenhamLow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.divide_tasks">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">divide_tasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataLength</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpuCount</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.divide_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the start and stop indices for an MPI loop that uses cpuCount CPUs to iterate over a list of length
+dataLength</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.ensure_colour_bright">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">ensure_colour_bright</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colour</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.ensure_colour_bright" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the input colour has a hsv value of less than 0.5, set it to 0.5. Returns the same or brighter colour</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.ensure_colour_dark">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">ensure_colour_dark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colour</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.ensure_colour_dark" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the input colour has a hsv value of greater than 0.5, set it to 0.5. Returns the same or darker colour</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.ensure_colour_faded">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">ensure_colour_faded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colour</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.ensure_colour_faded" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the input colour has a hsv saturation of more than 0.5, set it to 0.5. Returns the same or lighter colour</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.first">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">first</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.first" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.getPointsOnLine">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">getPointsOnLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">centre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.getPointsOnLine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.get_colour">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">get_colour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">switch_on_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.get_colour" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.get_colour_map">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">get_colour_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.get_colour_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.get_date_range_indices">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">get_date_range_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spot_group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.get_date_range_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>From a given spot group, find the indices of the snapshots that match the start and end dates</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.get_line_style">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">get_line_style</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">switch_on_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.get_line_style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a line style from a preset list based on current iteration.
+:param index: Current iteration number
+:param switch_on_iterations: If true, a new line style is returned for every time the index loops around the
+available colours. e.g. all values from 0 to len(colourlist) will be ‘-’, then from len(colourlist) to
+2*len(colourlist) will be ‘–’ etc. If false, the linestyle will loop around the linestyle list instead.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.get_marker">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">get_marker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.get_marker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.get_marker_cmp">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">get_marker_cmp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.get_marker_cmp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.is_coordinate_in_list">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">is_coordinate_in_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordinate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_of_coords</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.is_coordinate_in_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true if the coordinate given is in the list of coordinates, otherwise false.
+:param coordinate: a python list containing an x and y value. e.g. [0,0]
+:param list_of_coords: A python list of coordinates to check against. e.g. [[0,0],[1,2],[2,2]]
+:return: Bool</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.parse_string_to_datetime">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">parse_string_to_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.parse_string_to_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempt to get a datetime object from a string using different formats</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SpotTools.pixel_scale_from_centres">
+<span class="sig-prename descclassname"><span class="pre">SpotTools.</span></span><span class="sig-name descname"><span class="pre">pixel_scale_from_centres</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">centre_in_pixels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centre_in_arcsec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4096</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotTools.pixel_scale_from_centres" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses the difference in values for the centre point in pixels and arcsec to determine image scale</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Sunspot MLT</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Richard Grimes.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/SpotTools.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

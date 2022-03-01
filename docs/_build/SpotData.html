@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>SpotData module &#8212; Sunspot MLT 2022-03-01 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-SpotData">
+<span id="spotdata-module"></span><h1>SpotData module<a class="headerlink" href="#module-SpotData" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotData.Cluster">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotData.</span></span><span class="sig-name descname"><span class="pre">Cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_coordinates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_ellipse_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_threshold_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.Cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Object containing information on a single cluster within an MLT layer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.Cluster.get_centre">
+<span class="sig-name descname"><span class="pre">get_centre</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.Cluster.get_centre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the centre by taking the mean x- and y- values of all constituent points.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.Cluster.get_summary_for_text">
+<span class="sig-name descname"><span class="pre">get_summary_for_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.Cluster.get_summary_for_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a representation of the cluster object that can be printed to a text file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.Cluster.get_unique_id">
+<span class="sig-name descname"><span class="pre">get_unique_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.Cluster.get_unique_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotData.GroupSnapshot">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotData.</span></span><span class="sig-name descname"><span class="pre">GroupSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_qsun_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_centre_arcsec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_projected_next_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_memberSpots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_ROI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_mlt_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_ordering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.GroupSnapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Data container for a group across all images</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.GroupSnapshot.getSkyCoord">
+<span class="sig-name descname"><span class="pre">getSkyCoord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.GroupSnapshot.getSkyCoord" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotData.Layer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotData.</span></span><span class="sig-name descname"><span class="pre">Layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_threshold_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_mlt_clusters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_optics_ordering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.Layer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Object containing information on a single MLT layer</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotData.MLT_Layers">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotData.</span></span><span class="sig-name descname"><span class="pre">MLT_Layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.MLT_Layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Data object containing a list of layers for a given spot timestamp. Used to save MLT data without making the
+.dat files excessively big.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.MLT_Layers.add_or_replace_layers">
+<span class="sig-name descname"><span class="pre">add_or_replace_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_layer</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.MLT_Layers.add_or_replace_layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new layer to the list of layers. If one with the same threshold_ratio value exists, replace it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.MLT_Layers.find_layer_by_threshold">
+<span class="sig-name descname"><span class="pre">find_layer_by_threshold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_threshold_ratio</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.MLT_Layers.find_layer_by_threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.MLT_Layers.get_layer_thresholds">
+<span class="sig-name descname"><span class="pre">get_layer_thresholds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.MLT_Layers.get_layer_thresholds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.MLT_Layers.print_layers">
+<span class="sig-name descname"><span class="pre">print_layers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.MLT_Layers.print_layers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.MLT_Layers.remove_null_layers">
+<span class="sig-name descname"><span class="pre">remove_null_layers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.MLT_Layers.remove_null_layers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.MLT_Layers.sort_layers">
+<span class="sig-name descname"><span class="pre">sort_layers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.MLT_Layers.sort_layers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotData.ROI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotData.</span></span><span class="sig-name descname"><span class="pre">ROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_qsun_int</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_pixel_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_centre_arcsec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.ROI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotData.SpotData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotData.</span></span><span class="sig-name descname"><span class="pre">SpotData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_base_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/rig12/Work/TrackingData/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_config_parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.associate_mlt_files">
+<span class="sig-name descname"><span class="pre">associate_mlt_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sunspotGroupList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spot_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.associate_mlt_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that all files in the mlt folder are correctly associated with the dat files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.associate_roi_files">
+<span class="sig-name descname"><span class="pre">associate_roi_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sunspotGroupList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spot_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.associate_roi_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that all files in the roi folder are correctly associated with the dat files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.checkPath">
+<span class="sig-name descname"><span class="pre">checkPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepPosixPath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.checkPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks to see if _path exists and returns the path as a string. If the path doesn’t exist, it is made.
+:param _path: A str or pathlib Path to a directory.
+:return: A string representation of the string or path entered.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.check_ROI_headers">
+<span class="sig-name descname"><span class="pre">check_ROI_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sunspot_group</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.check_ROI_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Goes through the ROIs associated with a spot and checks to make sure they have a value for pixel_scale in
+their headers. Needed because I’m an idiot and have to fix this in post.
+:param sunspot_group: A SunspotGroup object (subscript of sunspot_group_list)
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.check_mlt_files">
+<span class="sig-name descname"><span class="pre">check_mlt_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sunspotGroupList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spot_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.check_mlt_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of dat files that do not have an associated mlt file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.check_roi_files">
+<span class="sig-name descname"><span class="pre">check_roi_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sunspotGroupList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spot_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.check_roi_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of dat files that do not have an associated roi file</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SpotData.SpotData.cluster_cache_size">
+<span class="sig-name descname"><span class="pre">cluster_cache_size</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">256</span></em><a class="headerlink" href="#SpotData.SpotData.cluster_cache_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.export_bad_velocities">
+<span class="sig-name descname"><span class="pre">export_bad_velocities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bad_velocities_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.export_bad_velocities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the parameters object for clusters where the velocity is too big.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.export_clusters_to_text">
+<span class="sig-name descname"><span class="pre">export_clusters_to_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cluster_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusters_to_print</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.export_clusters_to_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a list of clusters that have been tracked in MLT_Analysis and outputs their data in a plain text document.
+:param cluster_list:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.getDir">
+<span class="sig-name descname"><span class="pre">getDir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posix_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.getDir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages requests for directories. If a path with the specified key exists: returns that path. If not, then it
+makes it and stores a reference to it in self.dirs.
+:param key_string: key to access the path from the dictionary. Can be anything, by convention a single lowercase</p>
+<blockquote>
+<div><p>word</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>posix_path</strong> – a pathlib path to the requested place to save to.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>posix_path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.get_cluster_from_id">
+<span class="sig-name descname"><span class="pre">get_cluster_from_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.get_cluster_from_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the cluster object by matching the id value. ID’s are stored as a string that uniquely identifies the
+cluster and the mlt file it exists in. The file is then opened and the cluster object returned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.loadMLT">
+<span class="sig-name descname"><span class="pre">loadMLT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.loadMLT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a single MLT file and returns it
+:param _filename: filename in the mlt directory of target mlt
+:return: an MLT_Layers object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.loadParameters">
+<span class="sig-name descname"><span class="pre">loadParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spot_index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.loadParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.loadPathDic">
+<span class="sig-name descname"><span class="pre">loadPathDic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.loadPathDic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.loadROI">
+<span class="sig-name descname"><span class="pre">loadROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.loadROI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a single ROI file and returns it
+:param _filename: filename in the roi directory of target roi
+:return: an ROI object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.loadROIList">
+<span class="sig-name descname"><span class="pre">loadROIList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.loadROIList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.loadSpotData">
+<span class="sig-name descname"><span class="pre">loadSpotData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_fits_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ask_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.loadSpotData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.mergeSpots">
+<span class="sig-name descname"><span class="pre">mergeSpots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sunspot_group_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">child_indices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.mergeSpots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to merge two or more sunspots manually.
+:param parent_index: Index in sunspot_group_list of the spot to merge into
+:param child_indices: Indices of the spots to be merged, as a list or tuple.
+:param sunspot_group_list: List of all sunspot groups
+:return: list of sunspot groups with children groups merged into parent.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.requestNewDir">
+<span class="sig-name descname"><span class="pre">requestNewDir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posix_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.requestNewDir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a new directory and adds it to the dictionary to keep track of them.
+:param key_string: key to access the path from the dictionary. Can be anything.
+:param posix_path: a pathlib path to the requested place to save to.
+:return: returns posix_path if successful.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.saveMLTData">
+<span class="sig-name descname"><span class="pre">saveMLTData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_mlt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.saveMLTData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.saveParameters">
+<span class="sig-name descname"><span class="pre">saveParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spot_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.saveParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.savePathDic">
+<span class="sig-name descname"><span class="pre">savePathDic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.savePathDic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.saveROIData">
+<span class="sig-name descname"><span class="pre">saveROIData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_roi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.saveROIData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.saveSpotData">
+<span class="sig-name descname"><span class="pre">saveSpotData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sunspotGroupList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.saveSpotData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotData.testDirectories">
+<span class="sig-name descname"><span class="pre">testDirectories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotData.testDirectories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests the directory list to make sure all paths within it exist. If they do not it deletes them
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotData.SpotGroup">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotData.</span></span><span class="sig-name descname"><span class="pre">SpotGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_centred_snapshot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_isCloseToCentre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Data container for a group in a single image</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotGroup.getCentreTime">
+<span class="sig-name descname"><span class="pre">getCentreTime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotGroup.getCentreTime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotGroup.isConsecutiveSpot">
+<span class="sig-name descname"><span class="pre">isConsecutiveSpot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotGroup.isConsecutiveSpot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotGroup.isSpotCloseInTime">
+<span class="sig-name descname"><span class="pre">isSpotCloseInTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotGroup.isSpotCloseInTime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotGroup.removeDuplicateSnapshots">
+<span class="sig-name descname"><span class="pre">removeDuplicateSnapshots</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotGroup.removeDuplicateSnapshots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes duplicate entries in sunspot history.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SpotData.SpotGroup.sortHistory">
+<span class="sig-name descname"><span class="pre">sortHistory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotGroup.sortHistory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotData.SpotSnapshot">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotData.</span></span><span class="sig-name descname"><span class="pre">SpotSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_groupID</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_centre_arcsec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">darkestPoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_darkestPoint_arcsec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.SpotSnapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Data container for a single sunspot image.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SpotData.Sunspot">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpotData.</span></span><span class="sig-name descname"><span class="pre">Sunspot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TRef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SpotData.Sunspot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Data container for sunspots.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Sunspot MLT</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Richard Grimes.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/SpotData.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
