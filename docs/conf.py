@@ -32,8 +32,7 @@ release = '2022-03-01'
 # ones.
 extensions = [ 'sphinx.ext.autodoc',
                'sphinx.ext.doctest',
-               'sphinx.ext.autosummary',
-               'myst_parser'
+               'sphinx.ext.autosummary'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
