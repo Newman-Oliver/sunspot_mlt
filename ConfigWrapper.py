@@ -75,7 +75,7 @@ class ConfigWrapper():
         if self.logger_initiated:
             Logger.debug("[Config] [{0}] \'{1}\' = {2}".format(section, option, value))
 
-        list_input = value.strip('[]').replace(' ', '').split(',')
+        list_input = value.strip('[]').replace(' ', '').replace('\'','').split(',')
         if "None" in list_input:
             return None
         try:

@@ -525,7 +525,8 @@ class SpotData():
                 pickle.dump(group,file_object)
         return True
 
-    def loadSpotData(self, _path, ext_fits_dir=None, ask_input=True):
+    def loadSpotData(self, _path, ext_fits_dir=None, ask_input=True, associate_roi=False, associate_mlt=False,
+                     spot_index=0):
         Logger.log("Loading sunspots...")
         if ext_fits_dir is None:
             fits_base = self.getDir('fits_ext', posix_path=ext_fits_dir)
@@ -552,20 +553,28 @@ class SpotData():
             # Sort the list based on how long the history is (and thus how "complete" the spot data is).
             sunspotGroupList.sort(key=lambda x: len(x.history), reverse=True)
 
-            # Try to find matching ROI files in the roi directory. Only checks for 0th indexed spot as that is the
-            # longest and is likely to be the one being tracked.
-            check_roi_file = self.check_roi_files(sunspotGroupList)
-            if check_roi_file and ask_input:
-                look_for_roi = input("More than 1% dat files have no ROI, attempt to match roi files to spot? (Y/N): ")
-                if look_for_roi == 'Y' or look_for_roi == 'y':
-                    self.associate_roi_files(sunspotGroupList)
+            # Try to find ROI files in the roi directory with timestamps matching the dat files for the chosen spot.
+            # If the dat files don't have any ROI file associated with them then try to link them up.
+            check_roi_file = self.check_roi_files(sunspotGroupList, spot_index)
+            if check_roi_file:
+                if ask_input:
+                    look_for_roi = input("More than 1% dat files have no ROI, attempt to match roi files to spot? (Y/N): ")
+                    if look_for_roi == 'Y' or look_for_roi == 'y':
+                        self.associate_roi_files(sunspotGroupList, spot_index)
+                elif associate_roi:
+                    Logger.log("Associate_roi enabled and more than 1% of dat files have no ROI.")
+                    self.associate_roi_files(sunspotGroupList, spot_index)
 
             # Do the same for MLT files
-            check_mlt_file = self.check_mlt_files(sunspotGroupList)
-            if check_mlt_file and ask_input:
-                look_for_mlt = input("More than 1% dat files have no MLT, attempt to match mlt files to spot? (Y/N): ")
-                if look_for_mlt == 'Y' or look_for_mlt == 'y':
-                    self.associate_mlt_files(sunspotGroupList)
+            check_mlt_file = self.check_mlt_files(sunspotGroupList, spot_index)
+            if check_mlt_file:
+                if ask_input:
+                    look_for_mlt = input("More than 1% dat files have no MLT, attempt to match mlt files to spot? (Y/N): ")
+                    if look_for_mlt == 'Y' or look_for_mlt == 'y':
+                        self.associate_mlt_files(sunspotGroupList, spot_index)
+                elif associate_mlt:
+                    Logger.log("Associate_mlt enabled and more than 1% of dat files have no MLT.")
+                    self.associate_mlt_files(sunspotGroupList, spot_index)
 
             # Return the list!
             return sunspotGroupList

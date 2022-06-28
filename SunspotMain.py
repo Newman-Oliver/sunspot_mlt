@@ -30,7 +30,7 @@ class SunspotMain():
         self.rank = self.comm.Get_rank()
 
         # Init config parser
-        self.config_parser = ConfigWrapper.ConfigWrapper() #configparser.ConfigParser()
+        self.config_parser = ConfigWrapper.ConfigWrapper()
         if len(args) == 0:
             self.config_parser.read('config.ini')
         else:
@@ -80,6 +80,8 @@ class SunspotMain():
 
         # Checks
         self.check_ROI_headers = self.config_parser.getboolean('Checks','check_ROI_headers')
+        self.do_assoicate_roi = self.config_parser.getboolean('Checks','associate_roi')
+        self.do_assoicate_mlt = self.config_parser.getboolean('Checks','associate_mlt')
 
         # Instantiate Modules
         self.tracker = Tracking.SpotTracker(path_manager=self.spot_data,_comm=self.comm,
@@ -106,18 +108,18 @@ class SunspotMain():
             Logger.log("[SunspotMain] ERR: Cannot begin process - on head node!")
 
     def start_download(self):
-        if self.hostname.startswith(('sl', 'pcrig', 'Ind', 'ind', 'Rich', 'rich', 'main', 'localhost')):
-            runtime_dl = Logger.Runtime(label='Total Download Runtime: ')
-            self.downloader.slowGetFiles()
-            runtime_dl.print()
-        else:
-            Logger.log("[ERR] Unable to download as not on login node.")
+        runtime_dl = Logger.Runtime(label='Total Download Runtime: ')
+        self.downloader.slowGetFiles()
+        runtime_dl.print()
 
     def start_processing(self):
         Logger.log("SunspotMain started.")
 
         # Attempt to load spots
-        self.sunspotGroupList = self.spot_data.loadSpotData(self.spot_data.getDir('dat'), ask_input=self.ask_input)
+        self.sunspotGroupList = self.spot_data.loadSpotData(self.spot_data.getDir('dat'), ask_input=self.ask_input,
+                                                            associate_roi=self.do_assoicate_roi,
+                                                            associate_mlt=self.do_assoicate_mlt,
+                                                            spot_index=self.chosen_spot)
         if not self.sunspotGroupList:
             Logger.log("No sunspot tracking data found.")
         else:

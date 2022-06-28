@@ -96,6 +96,7 @@ class MultiLevelThresholding():
 
         # Reformat the data to be put into OPTICS and get clusters
         data_formatted = self.extract_data(data_thresh, threshold, use_weighting=self.use_weighting)
+        Logger.debug("[MLT - make_layer] Applying OPTICS...")
         cluster_indices, cluster_ordering = self.apply_optics(data_formatted, self.eps, self.min_pts)
 
         # Reformat the output of the OPTICS algorithm to use the data coords and not the array indices. Then put the
@@ -109,6 +110,7 @@ class MultiLevelThresholding():
             elli = self.do_ellipse_fit(cluster_coords)
             if elli is None:
                 counter_dict["none_clusters"] = counter_dict["none_clusters"] + 1 if "none_clusters" in counter_dict.keys() else 1
+                Logger.debug("[MLT - make_layer] Ellipse parameters for cluster {0} returned None!".format(cluster))
             clusters.append(SpotData.Cluster(_coordinates=cluster_coords, _datetime=timestamp,
                                              _threshold=threshold, _threshold_ratio=threshold_ratio,
                                              _ellipse_parameters=elli))
@@ -250,6 +252,7 @@ class MultiLevelThresholding():
                 continue
             filename = str(roi.timestamp).replace(':', '-')
             thresholds = np.round(threshold_ratios * roi.qsun_intensity)
+            Logger.debug("[MLT - run_thresholding_on_roi] Threshold pixel values: {0}".format(thresholds))
 
             layers = []
             for j in range(0, len(thresholds)):

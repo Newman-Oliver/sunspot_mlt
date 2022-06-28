@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import SpotData
 
-
 my_cmaps = ['flag', 'prism', 'ocean', 'gist_earth', 'terrain', 'gist_stern',
             'gnuplot', 'gnuplot2', 'CMRmap', 'cubehelix', 'brg', 'hsv',
             'gist_rainbow', 'rainbow', 'jet', 'nipy_spectral', 'gist_ncar',
@@ -30,6 +29,9 @@ def plot_all_cmaps(roiList, cmaps, dir):
         plt.close(fig)
 
 if __name__ == "__main__":
+    # Switch backend becaue tkinter doesn't like scw's headless environment.
+    plt.switch_backend('Agg')
+
     sd = SpotData.SpotData('/mnt/alpha/work/PhD/DataArchive/sunspots/2014-09-05_16-hourly/')
     roiList = sd.loadROIList(sd.getDir('roi'))
     plot_all_cmaps(roiList, my_cmaps, '/mnt/alpha/work/PhD/DataArchive/sunspots/2014-09-05_16-hourly/output/roi/')

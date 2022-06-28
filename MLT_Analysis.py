@@ -91,7 +91,8 @@ class MLT_Analyser:
         self.dpi = self.config_parser.getint('MLT_Analysis', 'fig_dpi')
         self.fig_font_size = self.config_parser.getint('MLT_Analysis', 'fig_font_size')
         self.label_clusters_on_roi = self.config_parser.getboolean('MLT_Analysis', 'label_clusters_on_roi')
-        self.highlight_bad_data = self.config_parser.getboolean('MLT_Analysis', 'highlight_bad_data')
+        self.highlight_bad_data = self.config_parser.get('MLT_Analysis', 'highlight_bad_data').strip().lower()
+        self.bad_data_ranges = self.config_parser.get_list_as_datetimes('MLT_Analysis', 'bad_data_ranges')
         self.plot_cme_times = self.config_parser.getboolean('MLT_Analysis', 'plot_cme_times')
         self.plot_flare_times = self.config_parser.getboolean('MLT_Analysis', 'plot_flare_times')
         self.displacement_size_differential_threshold = self.config_parser.getfloat('MLT_Analysis', 'displacement_size_differential_threshold')
@@ -1614,10 +1615,19 @@ class MLT_Analyser:
             # roi plot.
             return parameters
 
-    def ranges_from_list_indices(self, index_list):
+    def ranges_from_list_indices(self, index_list, data=None, return_values=False):
         """
         Returns a list of index pairs that mark the start/end of ranges within the input list.
-        e.g turns: [4,5,6,7,80,90,91,92,96] into [[4,7],[80,81],[90,93],[96,97]]
+        e.g turns: [4,5,6,7,80,90,91,92,96] into [[4,7],[80,81],[90,93],[96,97]].
+
+        Args:
+            index_list: list<int>. Indexes in data set "data".
+            data: list. Data set. Only required if return_values is True
+            return_values: boool. if True then returns the data values instead of just indices. Data must be supplied.
+
+        Returns: list<[start,stop]>. A list of start and stop values pairs (also a list).
+        i.e. [[4,7],[80,81],[90,93],[96,97]]
+
         """
         if len(index_list) == 0:
             return None
@@ -1627,17 +1637,53 @@ class MLT_Analyser:
         for i in range(1, len(index_list)):
             if index_list[i] != index_list[i-1] + 1:
                 sublist.append(index_list[i-1])
-                Logger.debug("[MLT_Analysis - ranges_from_list_indices] New index found, list of ranges: {0}".format(list_of_ranges))
             if len(sublist) == 2:
                 list_of_ranges.append(sublist)
                 sublist = [index_list[i]]
+            Logger.debug("[MLT_Analysis - ranges_from_list_indices] New index found,"
+                         + " sublist: {0}, list_of_ranges: {1}".format(sublist,list_of_ranges))
+        # if we end on an odd number, make it it's own small range and add to the list.
         if len(sublist) == 1:
             sublist.append(sublist[0])
             list_of_ranges.append(sublist)
+        # If two numbers in the sublists are the same, then make the range at least 1 wide.
         for element in list_of_ranges:
             if element[0] == element[1]:
                 element[1] = element[0] - 1 if element[0] - 1 >= 0 else 0
+        Logger.debug("[MLT_Analysis - ranges_from_list_indices] Final list of indices: {0}".format(list_of_ranges))
+        # If the values are wanted instead of indexes, do that.
+        if return_values:
+            for element in list_of_ranges:
+                element[0] = data[element[0]]
+                element[1] = data[element[1]]
         return list_of_ranges
+
+    def find_datetimes_in_list(self, list_datetimes, datetimes_to_find, return_indices=True):
+        """
+        Given a list of datetimes, find all datetimes in the datetimes_to_find list that exist within the listed
+        datetimes. Returns a list of indices of list_datetimes that is the nearest datetime match.
+
+        Args:
+            return_indices: boo. If True returns the index in the original list, if false returns the value
+            list_datetimes: list<datetime>. Input list of datetimes.
+            datetimes_to_find: list<datetime>. The datetimes to find.
+
+        Returns:
+
+        """
+        list_indices = []
+        for i in range(len(datetimes_to_find)):
+            for ii in range(len(list_datetimes) - 1):
+                date_start = list_datetimes[ii]
+                date_end = list_datetimes[ii + 1]
+                if date_end > datetimes_to_find[i] > date_start:
+                    if return_indices:
+                        list_indices.append(list_datetimes.index(date_start))
+                    else:
+                        list_indices.append(date_start)
+        if len(list_indices) == 0:
+            return None
+        return list_indices
 
     def plot_average_parameter(self, plt, cluster_list, plot_type, plot_index):
         """A different implementation of plot_on_single_graph that allows for the average of parameters in different
@@ -2517,8 +2563,7 @@ class MLT_Analyser:
     def multi_parameter_plot(self, snapshot_list, thresholds, plots):
         """
         ##############################################################################################################
-        !!!!!! USE THIS ONE !!!!
-        One plot method to rule them all.
+        !!!!!! USE THIS ONE FOR PARAMETER PLOTTING!!!!
         ##############################################################################################################
         """
         colour_map = SpotTools.MplColorHelper(self.colour_map_plots, self.colour_map_limits[0], self.colour_map_limits[1])
@@ -2670,7 +2715,18 @@ class MLT_Analyser:
                                 clusters_with_text_plotted.append(j)
 
                     # If highlighting of bad data is required, do that here.
-                    if self.highlight_bad_data and not do_average_plot:
+                    if self.highlight_bad_data == "manual" and not do_average_plot:
+                        data = list(params['time'])
+                        highlight_x_coords = self.find_datetimes_in_list(data, self.bad_data_ranges)
+                        highlight_x_coords = self.ranges_from_list_indices(highlight_x_coords)
+                        if highlight_x_coords is not None:
+                            for timerange in highlight_x_coords:
+                                graphs[j].axvspan(params['time'][timerange[0]],
+                                                  params['time'][timerange[1]],
+                                                  color=SpotTools.ensure_colour_faded(
+                                                      colour_map.get_rgb(thresholds[k])),
+                                                  alpha=0.5)
+                    elif self.highlight_bad_data == "automatic" and not do_average_plot:
                         if plot_type in self.param_tolerances.keys():
                             data = np.array(params[plot_type])
                             # Logger.debug(
@@ -2698,9 +2754,28 @@ class MLT_Analyser:
                     parameters_for_average = dict(sorted(parameters_for_average.items(), key=lambda item: item[0]))
                     graphs[j].plot_date(parameters_for_average.keys(), list(parameters_for_average.values()),
                                         color='black', marker=None, lw=2, linestyle='-')
-                    if self.highlight_bad_data:
+                    if self.highlight_bad_data == "manual":
+                        # if parameters_for_average[timestamp] is None:
+                        #     continue
+                        data = list(parameters_for_average.keys())
+
+                        highlight_x_coords = self.find_datetimes_in_list(data,self.bad_data_ranges)
+                        Logger.debug("[MLT_Analysis - highlight_bad_data] find_datetimes_in_list: {0}".format(highlight_x_coords))
+                        highlight_x_coords = [[data[highlight_x_coords[x-1]], data[highlight_x_coords[x]]] for x in range(1,len(highlight_x_coords))]
+                        #highlight_x_coords = self.ranges_from_list_indices(highlight_x_coords, data=data, return_values=True)
+                        Logger.debug("[MLT_Analysis - highlight_bad_data] ranges_from_list_indices: {0}".format(highlight_x_coords))
+                        if highlight_x_coords is not None:
+                            for timerange in highlight_x_coords:
+                                Logger.debug("[MLT_Analysis - highlight_bad_data] timerange: {0}".format(timerange)
+                                             + " parameters_for_average[timerange[0]] = {0}".format(parameters_for_average[timerange[0]])
+                                             + " parameters_for_average[timerange[1]] = {0}".format(parameters_for_average[timerange[1]]))
+                                graphs[j].axvspan(parameters_for_average[timerange[0]],
+                                                  parameters_for_average[timerange[1]],
+                                                  color='black',
+                                                  alpha=0.2)
+                    elif self.highlight_bad_data == "automatic":
                         if plot_type in self.param_tolerances.keys():
-                            data = np.array(params[plot_type])
+                            data = np.array(parameters_for_average[plot_type])
                             # Logger.debug(
                             #     "[MLT_Analysis - plot_on_single_graph] Highlight bad {0} data...".format(plot_type))
                             # highlight_x_coords = np.where(abs(data) > self.param_tolerances[plot_type])[0]
@@ -2715,9 +2790,9 @@ class MLT_Analyser:
                                     # Logger.debug(
                                     #     "[MLT_Analysis - plot_on_single_graph] timerange = {0}".format(timerange))
                                     graphs[j].axvspan(params['time'][timerange[0]],
-                                               params['time'][timerange[1]],
-                                               color='black',
-                                               alpha=0.2)
+                                                      params['time'][timerange[1]],
+                                                      color='black',
+                                                      alpha=0.2)
 
 
 
