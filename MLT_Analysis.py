@@ -37,6 +37,11 @@ class Outcome(enum.Enum):
     Displaced_by_size = 3
     Displaced_by_distance = 4
 
+
+def get_euclidean_sqr_dist(coord1, coord2):
+    return (coord1[0] - coord2[0]) ** 2 + (coord1[1] - coord2[1]) ** 2
+
+
 class MLT_Analyser:
     def __init__(self, _path_man, _config_parser, _comm, _spot_group=None):
         self.path_man = _path_man
@@ -178,35 +183,7 @@ class MLT_Analyser:
             start = 0
         else:
             start -= self.velocity_stride
-        if self.graph_type == 'og_scanline':
-            self.scanline_graph_path = self.path_man.getDir('output_og_scanline' + self.config_name,
-                                                            posix_path=(self.graph_path / (
-                                                                        'og_scanline' + self.config_name)))
-            self.one_graph_scanline(sunspot_group.history[start:stop], thresholds)
-        elif self.graph_type == 'combo':
-            self.combo_graph_path = self.path_man.getDir('output_combo' + self.config_name,
-                                                         posix_path=(self.graph_path / ('og_combo' + self.config_name)))
-            self.make_combo_timestep_graph(sunspot_group.history[start:stop], thresholds)
-        elif self.graph_type == 'one-graph':
-            self.one_graph_path = self.path_man.getDir('output_one_graph' + self.config_name,
-                                                       posix_path=(self.graph_path / ('one-graph' + self.config_name)))
-            self.one_graph_evolution(sunspot_group.history[start:stop], thresholds)
-        elif self.graph_type == 'og_sizes':
-            self.og_sizes_graph_path = self.path_man.getDir('output_og_sizes' + self.config_name,
-                                                            posix_path=(self.graph_path / (
-                                                                        'og_sizes' + self.config_name)))
-            self.one_graph_cluster_size(sunspot_group.history[start:stop], thresholds)
-        elif self.graph_type == 'polar_cnt':
-            self.polar_contour_graph_path = self.path_man.getDir('output_polar_cnt' + self.config_name,
-                                                                 posix_path=(self.graph_path / (
-                                                                             'polar_cnt' + self.config_name)))
-            self.polar_contour_visualiser(sunspot_group.history[start:stop], thresholds)
-        elif self.graph_type == 'area_sizes':
-            self.area_sizes_graph_path = self.path_man.getDir('output_area_sizes' + self.config_name,
-                                                              posix_path=(self.graph_path / (
-                                                                          'area_sizes' + self.config_name)))
-            self.area_one_graph_cluster_size(sunspot_group.history[start:stop], thresholds, self.plots_type)
-        elif self.graph_type == 'velocity_area_distribution':
+        if self.graph_type == 'velocity_area_distribution':
             self.velocity_against_area_distribution(sunspot_group.history[start:stop], thresholds)
         elif self.graph_type == 'velocity_area':
             self.velocity_area_graph_path = self.path_man.getDir('velocity_area' + self.config_name,
@@ -241,54 +218,6 @@ class MLT_Analyser:
         else:
             raise ValueError("Value for graph type '{0}' not valid.".format(self.graph_type))
 
-    def set_cluster_list(self):
-        self.cluster_list = self.track_clusters(self.spot_group.history, self.layer_index,
-                                                self.max_separation_distance, self.max_time_delta)
-        Logger.log("[MLT - Analysis] There were {0} clusters found.".format(len(self.cluster_list)),
-                   Logger.LogLevel.verbose)
-
-    def get_euclidean_sqr_dist(self, coord1, coord2):
-        return (coord1[0] - coord2[0]) ** 2 + (coord1[1] - coord2[1]) ** 2
-
-    def find_near_cluster(self, cluster, next_clusters, max_separation):
-        closest_cluster = None
-        closest_dist = max_separation ** 2
-        for potential_match in next_clusters:
-            sqr_dist = self.get_euclidean_sqr_dist(cluster.centre, potential_match.centre)
-            if sqr_dist < closest_dist:
-                closest_cluster = potential_match
-                closest_dist = sqr_dist
-        return closest_cluster
-
-    def get_cluster_parent(self, cluster, all_cluster_list, max_separation, max_time_delta):
-        """Given a cluster, and a list of cluster lists, find the cluster list that ends in the cluster closest in
-        space to the input cluster that is also within max_separation. This function returns a number equal to the
-        index of the cluster list that satisfies this condition."""
-        cluster_list_ends = []
-        closest_cluster_index = None
-        closest_dist = max_separation ** 2
-        for i in range(0, len(all_cluster_list)):
-            # Add last value in each list to a new list for easier iteration.
-            cluster_list_ends.append(all_cluster_list[i][-1])
-
-        # If the list length is 0, means the cluster list is empty so return None
-        if len(cluster_list_ends) == 0:
-            return None
-
-        # Find closest cluster using Euclidean distance and return the index in original list
-        for i in range(0, len(cluster_list_ends)):
-            potential_match = cluster_list_ends[i]
-            sqr_dist = self.get_euclidean_sqr_dist(cluster.centre, potential_match.centre)
-            if potential_match.datetime < cluster.datetime:
-                time_delta = (cluster.datetime - potential_match.datetime).seconds
-            else:
-                time_delta = (potential_match.datetime - cluster.datetime).seconds
-            if sqr_dist < closest_dist and time_delta < max_time_delta:
-                closest_cluster_index = i
-                closest_dist = sqr_dist
-
-        return closest_cluster_index
-
     def get_cluster_parent_area(self, cluster, all_cluster_list, max_separation, max_time_delta):
         """Given a cluster, and a list of cluster lists, find the cluster list that ends in the cluster closest in
         space to the input cluster that is also within max_separation and has a similar area. This function returns a
@@ -315,7 +244,7 @@ class MLT_Analyser:
         potential_indices = []
         for i in range(0, len(cluster_list_ends)):
             potential_match = cluster_list_ends[i]
-            sqr_dist = self.get_euclidean_sqr_dist(cluster.centre, potential_match.centre)
+            sqr_dist = get_euclidean_sqr_dist(cluster.centre, potential_match.centre)
             time_delta = (cluster.datetime - potential_match.datetime).seconds
             if sqr_dist < closest_dist and 0 < time_delta < max_time_delta:
                 potential_indices.append(i)
@@ -341,40 +270,26 @@ class MLT_Analyser:
 
         return closest_cluster_index, closest_area
 
-    def track_clusters(self, sunspots, layer_index, max_separation, max_time_delta):
-        """Given a time-ordered list of sunspots, collate all instances of clusters that appear to be sequential in
-        time. Returns a list of lists of clusters that appear to be the same cluster at different points in time."""
-        all_clusters_list = []
-        Logger.log("[track_clusters] length of sunspots array: {0}".format(len(sunspots)), Logger.LogLevel.debug)
-        for i in range(0, len(sunspots)):
-            # Try loading MLT. Not all spots will have MLT files (apparently) so skip if there is nothing there.
-            try:
-                mlt = self.path_man.loadMLT(sunspots[i].mlt_path)
-            except TypeError:
-                Logger.log("[MLT_Analyser] No MLT file found for sunspot {0}. Skipping..".format(
-                    str(sunspots[i].timestamp)), Logger.LogLevel.verbose)
-                continue
 
-            try:
-                clusters = mlt.find_layer_by_threshold(layer_index).mlt_clusters
-                Logger.log("[track_clusters] Found {0} clusters in layer".format(len(clusters)), Logger.LogLevel.debug)
-            except AttributeError as attr_err:
-                # Not all spots will have all layers, so if no layer found, move on.
-                Logger.log("[track_clusters] No clusters found in layer! Err: {0}".format(attr_err),
-                           Logger.LogLevel.debug)
-                continue
 
-            for cluster in clusters:
-                parent_cluster_index = self.get_cluster_parent(cluster, all_clusters_list,
-                                                               max_separation, max_time_delta)
-                if parent_cluster_index is None:
-                    all_clusters_list.append([cluster])
-                else:
-                    all_clusters_list[parent_cluster_index].append(cluster)
-        return all_clusters_list
+    # This seems to be the one I'm using for area tracking - 22/04/2020
+    def track_constant_area(self, sunspots, threshold, max_separation, cluster_to_track=0):
+        """
+        Track a single sunspot keeping the area as consistent as possible through time by allowing clusters to
+        change threshold layer. This is intended for use when tracking spots over short timescales (a few hours) during
+        large flare events, where white-light contamination could affect the cluster appearance. The reference point
+        is assumed to be the first image. This tracking method is not stable over long periods or with spots undergoing
+        significant changes in shape.
 
-    #FIXME: 22/04/2020 - This seems to be the one I'm using for area tracking
-    def track_one_cluster(self, sunspots, threshold, max_separation, cluster_to_track=0):
+        Checks each cluster in the following image to find the best match by cluster size first. The cluster with the
+        smallest difference in size that is also within the max separation distance is chosen as the best match.
+
+        :param sunspots: list. The sunspot group list.
+        :param threshold: float. The threshold ratio
+        :param max_separation: float. Maximum distance in pixels between two clusters.
+        :param cluster_to_track: int. The spot number of the spot to track.
+        :return:
+        """
         cluster_history = []
         mlt_initial = self.path_man.loadMLT(sunspots[0].mlt_path)
         layer_initial = SpotTools.first(l for l in mlt_initial.layers if l.threshold_ratio == threshold)
@@ -411,7 +326,7 @@ class MLT_Analyser:
             for potential_match in potential_clusters:
                 area_disparity = abs(cluster_initial.size - potential_match.size)
                 if area_disparity < closest_area:
-                    sqr_dist = self.get_euclidean_sqr_dist(last_cluster.centre, potential_match.centre)
+                    sqr_dist = get_euclidean_sqr_dist(last_cluster.centre, potential_match.centre)
                     if sqr_dist < max_separation ** 2:
                         likely_next_cluster = potential_match
                         closest_area = area_disparity
@@ -419,7 +334,7 @@ class MLT_Analyser:
             cluster_history.append(likely_next_cluster)
         return cluster_history
 
-    # TODO: This is the new fancy way of doing it. 08/06/2020
+    # This is the main way of doing it. 08/06/2020
     def multi_track_clusters(self, sunspots, thresholds):
         Logger.debug("[MLT_Analysis - multi_track_clusters] Running multi-tracking...")
         # Initialise
@@ -591,7 +506,7 @@ class MLT_Analyser:
                             if len(matches_in_layer_above) == 1:
                                 parent = matches_in_layer_above[0]
                             elif len(matches_in_layer_above) > 0:
-                                distances = [(self.get_euclidean_sqr_dist(cluster.centre, m.centre), m) for m in matches_in_layer_above]
+                                distances = [(get_euclidean_sqr_dist(cluster.centre, m.centre), m) for m in matches_in_layer_above]
                                 distances.sort(key=lambda x: x[0])
                                 parent = distances[0][1]
 
@@ -700,6 +615,7 @@ class MLT_Analyser:
         Check the list of clusters in previous image for any that have a similar centre point to the input cluster.
         Add cluster to the layer_dict by either associating it with a previously identified cluster, or by giving it
         a new id, then return the updated layer_dict and total_cluster_counter.
+
         :param layer_dict:
         :param total_cluster_counter:
         :param cluster:
@@ -775,70 +691,9 @@ class MLT_Analyser:
         :param clusters:
         :return: [(float, obj), ...] List of tuples [(sqr_distance_to_cluster, cluster), ...]
         """
-        dists_to_reference = [(np.sqrt(self.get_euclidean_sqr_dist(reference_cluster.centre, c.centre)), c) for c in clusters]
+        dists_to_reference = [(np.sqrt(get_euclidean_sqr_dist(reference_cluster.centre, c.centre)), c) for c in clusters]
         dists_to_reference.sort(key=lambda y: y[0])
         return dists_to_reference
-
-    def track_specific_clusters(self, sunspots, thresholds, max_separation, max_time_delta):
-        all_clusters_list = []
-        for i in range(0, len(sunspots)):
-            try:
-                mlt = self.path_man.loadMLT(sunspots[i].mlt_path)
-            except TypeError:
-                Logger.log("[MLT_Analyser] No MLT file found for sunspot {0}. Skipping..".format(
-                    str(sunspots[i].timestamp)), Logger.LogLevel.verbose)
-                continue
-
-            clusters = []
-            for layer in mlt.layers:
-                try:
-                    clusters.extend(layer.mlt_clusters)
-                except AttributeError:
-                    # Not all spots will have all layers, so if no layer found, move on.
-                    continue
-
-            clusters.sort(key=lambda x: x.size, reverse=True)
-            cluster_match_disparity = []
-            cluster_match_index = []
-            cluster_match_object = []
-            # Add a list for each threshold layer being looked for. Each list will contain the "contenders" for each
-            # layer and the chosen one will be the one with the least disparity.
-            for threshold in thresholds:
-                cluster_match_disparity.append([])
-                cluster_match_index.append([])
-                cluster_match_object.append([])
-
-            for cluster in clusters:
-                index, disparity = self.get_cluster_parent_area(cluster, all_clusters_list,
-                                                                max_separation, max_time_delta)
-
-                # If no index and not too many clusters of the same starting threshold, just add the cluster to the
-                # all clusters list as a starting point
-                if index is None:
-                    if (cluster.threshold_ratio in thresholds and
-                            len([x for x in all_clusters_list if x[0].threshold_ratio == cluster.threshold_ratio]) < 3):
-                        all_clusters_list.append([cluster])
-                else:
-                    if cluster.threshold_ratio in thresholds:
-                        threshold_index = thresholds.tolist().index(cluster.threshold_ratio)
-                        cluster_match_index[threshold_index].append(index)
-                        cluster_match_disparity[threshold_index].append(disparity)
-                        cluster_match_object[threshold_index].append(cluster)
-
-            # For each desired layer, unpack the lists of potential next clusters, compare the sizes, and the smallest
-            # one gets the job.
-            for threshold in thresholds:
-                threshold_index = thresholds.tolist().index(threshold)
-                match_index_list = cluster_match_index[threshold_index]
-                match_disparity_list = cluster_match_disparity[threshold_index]
-                match_object_list = cluster_match_object[threshold_index]
-
-                if len(match_disparity_list) == 0:
-                    continue
-                index = match_disparity_list.index(min(match_disparity_list))
-                all_clusters_list[match_index_list[index]].append(match_object_list[index])
-
-        return all_clusters_list
 
     def track_clusters_by_area(self, sunspots, max_separation, max_time_delta):
         """Tracks clusters through MLT layers based on their area (size) and centre point. This does not rely on
@@ -937,31 +792,6 @@ class MLT_Analyser:
     def get_ellipticity(self, axes):
         return (axes[1] - axes[0]) / axes[1]
 
-    def filter_bad_velocities(self, parameters, apply_savgol=False):
-        """Checks for velocities that exceed the first delta_2_cutoff, and removes them."""
-        bad_velocities_data = []
-        for i in range(0, len(parameters['velocity'])):
-            # check for a large change in size
-            if abs(parameters['velocity'][i]) > abs(self.param_tolerances['velocity']):
-                bad_velocities_data.append([parameters['velocity'][i],
-                                            parameters['size'][i],
-                                            parameters['ellipticity'][i],
-                                            parameters['delta_1st_size'][i],
-                                            parameters['delta_1st_ellipticity'][i]])
-                parameters['velocity'][i] = np.nan
-                # if abs(parameters['delta_1st_size'][i]) > abs(self.delta_2_cutoffs[1]):
-                #     parameters['velocity'][i] = np.nan
-                # else:
-                #     parameters['velocity'][i] = np.nan
-                #     Logger.log("[MLT_Analysis - filter_bad_velocities] Velocity {0} exceeds cutoff ".format(parameters['velocity'][i])
-                #                + "but did not trigger any filter.\n"
-                #                + "delta_size: {0} delta_ellipticity: {1}".format(parameters['delta_1st_size'][i],
-                #                                                                  parameters['delta_1st_ellipticity'][i]))
-        if apply_savgol and len(parameters['velocity']) > 11:
-            parameters['velocity'] = sav_gol.savgol_filter(parameters['velocity'], 11, 3)
-
-        return parameters['velocity']
-
     def differentiate_parameter(self, parameter, timestamp_list, stride, do_smooth=False, abs_threshold=None, relative=False):
         """
         Returns the differential of the given parameter, replacing outliers with NaNs if abs_threshold specified.
@@ -1013,19 +843,6 @@ class MLT_Analyser:
         perimeter_polar = perimeter_polar.tolist()
         return Contours.reformat_perimeter(perimeter_polar)
 
-    def polar_perimeter_variation(self, current_perimeter, previous_perimeter):
-        """Calculates the variance in the differences between two polar coord perimeters. A large value means that two
-        perimeters are substantially different. Interpolation is used to ensure both perimeters are 360 deg long"""
-        # polar coords given in form [r, phi] so need to switch order for interp.
-        fx = interp1d(current_perimeter[1], current_perimeter[0], kind='cubic', fill_value='extrapolate')
-        gx = interp1d(previous_perimeter[1], previous_perimeter[0], kind='cubic', fill_value='extrapolate')
-
-        xnew = np.deg2rad(np.arange(-180,180))
-        fnew = fx(xnew)
-        gnew = gx(xnew)
-
-        variance = np.sum((fnew - gnew) ** 2)
-        return variance
 
     def get_cluster_params(self, cluster_list, threshold_layer, spot_index, thresholds, tryload=True):
         """Get a number of cluster parameters for each cluster in cluster list and return as a dictionary.
@@ -1095,7 +912,7 @@ class MLT_Analyser:
             parameters['centre'].append(c.centre)
             parameters['equivalent_radius'].append(np.sqrt(c.ellipse_parameters[1][0] * c.ellipse_parameters[1][1])*0.5)
             parameters['threshold_ratio'].append(c.threshold_ratio)
-            parameters['distance'].append(np.sqrt(self.get_euclidean_sqr_dist(self.region_centre, c.centre)))
+            parameters['distance'].append(np.sqrt(get_euclidean_sqr_dist(self.region_centre, c.centre)))
             parameters['intensity'].append(c.threshold)
             parameters['global_intensity'].append(c.threshold * (1.0 / c.threshold_ratio))
             parameters['ellipticity'].append(self.get_ellipticity(c.ellipse_parameters[1]))
@@ -1128,25 +945,6 @@ class MLT_Analyser:
         parameters["smoothed_angle"] = scipy.ndimage.median_filter(parameters["angle"],
                                                                    size=self.median_filter_window_size,
                                                                    mode='nearest')
-
-        # Get second order derivatives
-        # parameters['delta_1st_angle'] = np.diff(parameters['angle'], n=1, prepend=parameters['angle'][0])
-        # parameters['delta_1st_size'] = self.differentiate_parameter(parameters['size'], parameters['time'],
-        #                                                       self.velocity_stride, do_smooth=False,
-        #                                                       abs_threshold=None)
-        # parameters['delta_1st_ellipticity'] = self.differentiate_parameter(parameters['ellipticity'], parameters['time'],
-        #                                                             self.velocity_stride, do_smooth=False,
-        #                                                             abs_threshold=None)
-        # parameters['delta_2nd_angle'] = np.diff(parameters['delta_1st_angle'], n=1, prepend=0)
-        # parameters['delta_2nd_size'] = np.diff(parameters['delta_1st_size'], n=1, prepend=0)
-        # parameters['delta_2nd_ellipticity'] = np.diff(parameters['delta_1st_ellipticity'], n=1, prepend=0)
-        # Logger.debug("[Cluster Parameters] Mean Angle Diff: {0} Median Angle Diff: {1}".format(np.nanmean(parameters['delta_2nd_angle']),
-        #                                                                                        np.nanmedian(parameters['delta_2nd_angle'])))
-        # Logger.debug("[Cluster Parameters] Mean Size Diff: {0} Median Size Diff: {1}".format(np.nanmean(parameters['delta_2nd_size']),
-        #                                                                                        np.nanmedian(parameters['delta_2nd_size'])))
-        # Logger.debug("[Cluster Parameters] Mean Ellipticity Diff: {0} Median Ellipticity Diff: {1}".format(np.nanmean(parameters['delta_2nd_ellipticity']),
-        #                                                                                        np.nanmedian(parameters['delta_2nd_ellipticity'])))
-
         # Calculate First Order derivatives
         #parameters['delta_perimeter'] = np.diff(parameters['perimeter_length'], prepend=parameters['perimeter_length'][0])
         parameters['delta_perimeter'] = self.differentiate_parameter(parameters["perimeter_length"], parameters["time"],
@@ -1238,142 +1036,6 @@ class MLT_Analyser:
             results.append(parameter_slice[parameter][search_result[0][0]])
         return results[0] if len(results) == 1 else results
 
-
-    @PendingDeprecationWarning
-    def run_velocity_analysis(self):
-
-        # Set up plot
-        fig = plt.figure(figsize=(16, 9), dpi=90)
-        plt.rcParams.update({'font.size': 16})
-        ax = fig.add_subplot(111)
-
-        # Loop params
-        count_too_few_history = 0
-        count_too_jumpy = 0
-        count_plotted = 0
-
-        for i in range(0, len(self.cluster_list)):
-            # Check the spot is seen in enough frames to be worthwhile
-            if len(self.cluster_list[i]) < 10:
-                count_too_few_history += 1
-                continue
-
-            # Get the angles of the spot at each time frame
-            times, angles, sizes, distances = self.get_cluster_params(self.cluster_list[i])
-
-            # If empty, skip.
-            if len(times) == 0 or len(angles) == 0 or len(sizes) == 0:
-                continue
-
-            # Check to make sure data isn't jumping around too wildly
-            if self.is_too_jumpy(angles, 30):
-                count_too_jumpy += 1
-                continue
-
-            # Check if too small for layer 0
-            if self.layer_index == 0:
-                if np.mean(sizes) < self.minimum_cluster_size:
-                    continue
-
-            # Smooth the angles
-            smooth_angles = sav_gol.savgol_filter(angles, 7, 3)
-
-            # Get angular velocities
-            velocities = self.get_angular_velocity(times, smooth_angles, 8)
-
-            # Plot
-            ax.plot_date(matdates.date2num(times), velocities, color=SpotTools.get_colour(count_plotted),
-                         linestyle=SpotTools.get_line_style(count_plotted))
-            count_plotted += 1
-
-        # Format the plot
-        date_formatter = matdates.DateFormatter('%d/%m')
-        ax.xaxis.set_major_formatter(date_formatter)
-        ax.set_title("Cluster velocities at threshold {0} ({1}I)".format(self.cluster_list[i][0].threshold,
-                                                                         self.cluster_list[i][0].threshold_ratio))
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Major axis velocity (deg per hour)")
-        ax.xaxis_date()
-        # lgd = ax.legend(title=r'Average $\sqrt{size}$ by colour', bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-        plt.savefig(str(self.graph_path / ('l' + str(self.layer_index) + '_cluster_velocities.png')))
-        Logger.log("[MLT-Analysis] Plotting Complete! {0} Clusters, {1} plotted, {2} too small, {3} too jumpy.".format(
-            len(self.cluster_list), len(self.cluster_list) - count_too_jumpy - count_too_few_history,
-            count_too_few_history, count_too_jumpy
-        ), Logger.LogLevel.verbose)
-
-    @PendingDeprecationWarning
-    def run_angle_analysis(self):
-
-        # Set up Plot
-        fig = plt.figure(figsize=(16, 9), dpi=90)
-        plt.rcParams.update({'font.size': 16})
-        ax = fig.add_subplot(111)
-
-        # Get biggest cluster size
-        biggest_cluster_size = 0
-        for i in range(0, len(self.cluster_list)):
-            for c in self.cluster_list[i]:
-                if np.sqrt(c.size) > biggest_cluster_size:
-                    biggest_cluster_size = np.sqrt(c.size)
-
-        count_toosmall = 0
-        count_toojumpy = 0
-        count_plotted = 0
-
-        for i in range(0, len(self.cluster_list)):
-            if len(self.cluster_list[i]) <= 10:
-                count_toosmall += 1
-                continue
-
-            xx, yy, ss, dd = self.get_cluster_params(self.cluster_list[i])
-
-            # If empty, skip.
-            if len(xx) == 0 or len(yy) == 0 or len(ss) == 0:
-                continue
-
-            xx = matdates.date2num(xx)
-
-            # Sum up the differences in angle between consecutive values to provide an estimate for how "jumpy" the
-            # graph is. high values will mean the major axis angle is unreliable at this point and should be skipped.
-            if self.is_too_jumpy(yy, 30):
-                count_toojumpy += 1
-                continue
-
-            # Skip if the size is too small for layer 0
-            if self.layer_index == 0:
-                if np.mean(ss) < 10:
-                    continue
-
-            # Make pretty colours
-            colourmap = SpotTools.MplColorHelper(SpotTools.get_colour_map(count_plotted), 0, 25)
-            cc = [colourmap.get_rgb(c) for c in ss]
-            cc = np.array(cc)
-            cc.reshape(-1, 4)
-
-            # Smooth with Savitzky-Golay filter
-            # sg = sav_gol.savgol_filter(yy,5,3)
-
-            # Plot the cluster
-            ax.scatter(xx, yy, color=cc, marker=SpotTools.get_marker_cmp(count_plotted),
-                       label=str(round(np.mean(ss), 2)))
-            ax.plot_date(xx, yy, color=colourmap.get_rgb(49), alpha=0.3,
-                         linestyle=SpotTools.get_line_style(count_plotted), marker=None)
-            count_plotted += 1
-
-        # Format the plot
-        date_formatter = matdates.DateFormatter('%d/%m')
-        ax.xaxis.set_major_formatter(date_formatter)
-        ax.set_title("Clusters at threshold {0} ({1}I)".format(self.cluster_list[i][0].threshold,
-                                                               self.cluster_list[i][0].threshold_ratio))
-        ax.xaxis_date()
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Major axis angle (deg)")
-        lgd = ax.legend(title=r'Average $\sqrt{size}$ by colour', bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-        plt.savefig(str(self.output_path / 'cluster_angles_time.png'), bbox_extra_artists=(lgd,), bbox_inches='tight')
-        Logger.log("[MLT-Analysis] Plotting Complete! {0} Clusters, {1} plotted, {2} too small, {3} too jumpy.".format(
-            len(self.cluster_list), len(self.cluster_list) - count_toojumpy - count_toosmall,
-            count_toosmall, count_toojumpy
-        ), Logger.LogLevel.verbose)
 
     def fix_wrapping(self, angle, last_angle):
         """Stop wrapping around -90/90 and instead wrap around -180/180"""
@@ -1727,24 +1389,6 @@ class MLT_Analyser:
             plt.ylim(y_limits[0], y_limits[1])
         count_plotted += 1
 
-    def plot_polar_contour(self, plt, cluster_list, layer, bounds, colour_map):
-        for i in range(bounds[0], bounds[1]):
-            cluster = cluster_list[0][i]
-            perimeter_cart = Contours.getPerimeter(cluster.points)
-            perimeter_cart = Contours.reformat_perimeter(perimeter_cart)
-            perimeter_pol = Contours.cart2polData(perimeter_cart[0], perimeter_cart[1], cluster.centre)
-            perimeter_pol = perimeter_pol.tolist()
-            perimeter_pol.sort(key=lambda x: x[1])
-            perimeter_pol = Contours.reformat_perimeter(perimeter_pol)
-
-            iter = i - bounds[0]
-            if i == bounds[1] - 1:
-                plt.fill_between(perimeter_pol[1], perimeter_pol[0], facecolor=colour_map.get_rgb(layer),
-                                 edgecolor='black', linewidth=2., alpha=0.7)
-            else:
-                plt.fill_between(perimeter_pol[1], perimeter_pol[0], facecolor=colour_map.get_rgb(layer),
-                                 edgecolor='black', linewidth=2., linestyle='-', alpha=0.1)
-
     def plot_polar_perimeter(self, plt, cluster_list, layer, bounds, colour_map):
         for i in range(bounds[0], bounds[1]):
             cluster = cluster_list[0][i]
@@ -1815,8 +1459,6 @@ class MLT_Analyser:
         plt.xlabel("Distance (pix)")
         plt.ylabel("Distance (pix)")
         return True
-
-
 
     def plot_clusters_on_roi(self, ax, fig, snapshot, clusters, colourmap):
         """Used to plot an ROI showing a sunspot onto a plt object."""
@@ -1893,297 +1535,6 @@ class MLT_Analyser:
             ax.set_ylabel(self.y_axis_labels["roi_screen"])
         return True
 
-    @PendingDeprecationWarning
-    def one_graph_evolution(self, snapshot_list, thresholds):
-        """Creates a series of graphs showing the roi and cumulative angle/velocity-time graphs for each time step. Can
-        be used to create movies, however takes a very long time and is exponential with n"""
-        prog_one_graph = PrintProgress(0, len(snapshot_list), label="[MLT_Analysis] Plotting One-graph graphs...")
-        colour_map = SpotTools.MplColorHelper('gist_rainbow', self.colour_map_limits[0], self.colour_map_limits[1])
-        for i in range(0, len(snapshot_list)):
-            fig = plt.figure(figsize=(16, 9), dpi=90)
-            gridspec.GridSpec(2, 3)
-            filename = snapshot_list[i].timestamp.strftime('%Y-%m-%d_%H-%M-%S')
-
-            # Plot image of spot
-            plt.subplot2grid((2, 3), (0, 0), colspan=1, rowspan=2)
-            plt.title(snapshot_list[i].timestamp)
-            roi_plotted = self.plot_roi_on_plt(plt, fig, snapshot_list[i], thresholds, colour_map)
-            if not roi_plotted:
-                continue
-
-            # Track clusters at each layer and add them to a list to be plotted
-            cluster_list_list = []
-            for j in range(0, len(thresholds)):
-                cluster_list = self.track_clusters(snapshot_list[:i], thresholds[j],
-                                                   self.max_separation_distance, self.max_time_delta)
-                Logger.log("[make_combo...] length of cluster_list_{0}: {1}".format(j, len(cluster_list)),
-                           Logger.LogLevel.debug)
-                cluster_list_list.append(cluster_list)
-
-            # Plot Angles
-            plt.subplot2grid((2, 3), (0, 1), colspan=2)
-            plt.xlabel("Time (d HH:MM)")
-            plt.ylabel("Major axis angle (deg)")
-            for j in range(0, len(cluster_list_list)):
-                self.plot_on_single_graph(plt, cluster_list_list[j], thresholds[j], 'angle', colour_map)
-
-            # Plot velocities
-            plt.subplot2grid((2, 3), (1, 1), colspan=2)
-            plt.xlabel("Time (d HH:MM)")
-            plt.ylabel("Major axis velocity (deg per hour)")
-            for j in range(0, len(cluster_list_list)):
-                self.plot_on_single_graph(plt, cluster_list_list[j], thresholds[j], 'velocity', colour_map)
-
-            # Cleanup and save
-            leg = plt.legend()
-            fig.tight_layout()
-            plt.savefig(str(self.one_graph_path / (filename + '.png')))
-            prog_one_graph.update()
-
-    @PendingDeprecationWarning
-    def one_graph_scanline(self, snapshot_list, thresholds):
-        prog_scanline = PrintProgress(0, len(snapshot_list), label="[MLT_Analysis] Plotting scanline graphs...")
-        colour_map = SpotTools.MplColorHelper('gist_rainbow', self.colour_map_limits[0], self.colour_map_limits[1])
-        # Get the clusters for each layer and add them to a single list
-        layer_cluster_lists = []
-        for j in range(0, len(thresholds)):
-            layer_cluster_lists.append(self.track_clusters(snapshot_list, thresholds[j],
-                                                           self.max_separation_distance, self.max_time_delta))
-        for i in range(0, len(snapshot_list)):
-            fig = plt.figure(figsize=(16, 9), dpi=90)
-            gridspec.GridSpec(2, 3)
-            filename = snapshot_list[i].timestamp.strftime('%Y-%m-%d_%H-%M-%S')
-
-            # Plot image of spot
-            plt.subplot2grid((2, 3), (0, 0), colspan=1, rowspan=2)
-            plt.title(snapshot_list[i].timestamp)
-            roi_plotted = self.plot_roi_on_plt(plt, fig, snapshot_list[i], thresholds, colour_map)
-            if not roi_plotted:
-                continue
-
-            # Plot Angles
-            plt.subplot2grid((2, 3), (0, 1), colspan=2)
-            plt.xlabel("Time (d HH:MM)")
-            plt.ylabel("Major axis angle (deg)")
-            for j in range(0, len(layer_cluster_lists)):
-                self.plot_on_single_graph(plt, layer_cluster_lists[j], thresholds[j], 'angle', colour_map)
-            plt.axvline(matdates.date2num(snapshot_list[i].timestamp), color='black')
-
-            # Plot velocities
-            plt.subplot2grid((2, 3), (1, 1), colspan=2)
-            plt.xlabel("Time (d HH:MM)")
-            plt.ylabel("Major axis velocity (deg per hour)")
-            for j in range(0, len(layer_cluster_lists)):
-                self.plot_on_single_graph(plt, layer_cluster_lists[j], thresholds[j], 'velocity', colour_map)
-            plt.axvline(matdates.date2num(snapshot_list[i].timestamp), color='black')
-
-            # Cleanup and save
-            leg = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            fig.tight_layout()
-            plt.savefig(str(self.scanline_graph_path / (filename + '.png')))
-            prog_scanline.update()
-
-    #@PendingDeprecationWarning
-    def make_combo_timestep_graph(self, snapshot_list, thresholds):
-        """Make a per-frame plot of the angles at each layer, and show the image of the contours."""
-
-        # Get clusters
-        #all_cluster_lists = self.get_clusters_for_plot(snapshot_list, thresholds)
-        cluster_lists = []
-        prog_clusters_track = Logger.PrintProgress(0, len(thresholds), label="[MLT_Analysis] Tracking clusters...")
-        for threshold in thresholds:
-            cluster_lists.append(self.track_clusters(snapshot_list[:], threshold,
-                                             self.max_separation_distance, self.max_time_delta))
-            prog_clusters_track.update()
-
-        prog_combo = PrintProgress(0, len(snapshot_list), label='[MLT_Analysis] Plotting combo graphs... ')
-        Logger.debug("[MLT_Analysis - combo] Start: {0} End: {1} Length: {2}".format(
-            snapshot_list[0].timestamp.strftime('%Y-%m-%d_%H-%M-%S'),
-            snapshot_list[-1].timestamp.strftime('%Y-%m-%d_%H-%M-%S'),
-            len(snapshot_list)))
-
-        for i in range(0, len(snapshot_list)):
-            # Set up figure
-            fig = plt.figure(figsize=(16, 9), dpi=90)
-            # plt.rcParams.update({'font.size': 16})
-            gridspec.GridSpec(4, 4)
-            filename = snapshot_list[i].timestamp.strftime('%Y-%m-%d_%H-%M-%S')
-            plt.subplot2grid((4, 4), (0, 0), colspan=4, rowspan=2)
-            plt.title(snapshot_list[i].timestamp)
-
-            # Load ROI
-            try:
-                roi = self.path_man.loadROI(snapshot_list[i].ROI_path)
-            except:
-                continue
-
-            # Plot background
-            plt.imshow(roi.data, cmap='inferno', aspect='auto')
-
-            # Load MLT
-            try:
-                mlt = self.path_man.loadMLT(snapshot_list[i].mlt_path)
-            except:
-                continue
-
-            # Plot contours for the given thresholds
-            layers = [l for l in mlt.layers if l.threshold_ratio in thresholds]
-            Logger.debug("[MLT_Analysis - combo] len(mlt.layers) = {0} mlt.layers threshold ratios = {1} ".format(len(mlt.layers), [l.threshold_ratio for l in mlt.layers]))
-            Logger.log("[MLT_Analysis - combo] number of layers: {0}".format(len(layers)), Logger.LogLevel.debug)
-            for j in range(0, len(layers)):
-                layer = layers[j]
-                if layer is None:
-                    continue
-                for cluster in layer.mlt_clusters:
-                    if len(cluster.points) < 10:
-                        # Reject because too small
-                        continue
-
-                    # Attempt at plotting only the perimeter
-                    perimeter = Contours.getPerimeter(cluster.points)
-                    # change perimeter from a list of [[x,y], ...] coords to a list of [[x],[y]] coords.
-                    perimeter = [list(x) for x in zip(*perimeter)]
-                    plt.scatter(perimeter[0], perimeter[1], c=SpotTools.colours_combo_contour[j],
-                                label=str(layer.threshold_ratio) + r"$I_{quiet sun}$",
-                                marker='s', s=(72. / fig.dpi) ** 2)
-
-                    # Getting Ellipse fit
-                    elli, xx, yy = MLT.MultiLevelThresholding.fit_ellipse(perimeter[0], perimeter[1])
-                    if elli is None:
-                        continue
-
-                    # Record parameters and plot.
-                    # cluster.ellipse_parameters = elli
-                    plt.plot(xx, yy, c=SpotTools.colours_combo_ellipse[j], ms=(72. / fig.dpi))
-
-            # Set up Contour plot axes
-            plt.xlim(self.viewport_ranges[0])
-            plt.ylim(self.viewport_ranges[1])
-            plt.xlabel("Distance (pix)")
-            plt.ylabel("Distance (pix)")
-
-            # Get the 0th layer angle plots
-            # cluster_list_0 = self.track_clusters(snapshot_list[:i], thresholds[0],
-            #                                      self.max_separation_distance, self.max_time_delta)
-            # Logger.log("[MLT_Analysis - combo] length of cluster_list_0: {0}".format(len(cluster_list_0)),
-            #            Logger.LogLevel.debug)
-            plt.subplot2grid((4, 4), (2, 0), colspan=2)
-            self.angles_on_axis(plt, cluster_lists[0], thresholds[0], 0)
-            plt.xlim(matdates.date2num(self.start_date), matdates.date2num(self.end_date))
-
-            # Get the 1st layer angle plots
-            # cluster_list_1 = self.track_clusters(snapshot_list[:i], thresholds[1],
-            #                                      self.max_separation_distance, self.max_time_delta)
-            plt.subplot2grid((4, 4), (2, 2), colspan=2)
-            self.angles_on_axis(plt, cluster_lists[1], thresholds[1], 1)
-            plt.xlim(matdates.date2num(self.start_date), matdates.date2num(self.end_date))
-
-            # Get the 2nd layer angle plots
-            # cluster_list_2 = self.track_clusters(snapshot_list[:i], thresholds[2],
-            #                                      self.max_separation_distance, self.max_time_delta)
-            plt.subplot2grid((4, 4), (3, 0), colspan=2)
-            self.angles_on_axis(plt, cluster_lists[2], thresholds[2], 2)
-            plt.xlim(matdates.date2num(self.start_date), matdates.date2num(self.end_date))
-
-            # Get the 3rd layer angle plots
-            # cluster_list_3 = self.track_clusters(snapshot_list[:i], thresholds[3],
-            #                                      self.max_separation_distance, self.max_time_delta)
-            plt.subplot2grid((4, 4), (3, 2), colspan=2)
-            self.angles_on_axis(plt, cluster_lists[3], thresholds[3], 3)
-            plt.xlim(matdates.date2num(self.start_date), matdates.date2num(self.end_date))
-
-            fig.tight_layout()
-            plt.savefig(str(self.combo_graph_path / (filename + '.png')))
-            prog_combo.update()
-
-    @PendingDeprecationWarning
-    def one_graph_cluster_size(self, snapshot_list, thresholds):
-        prog_cluster_size = PrintProgress(0, len(snapshot_list),
-                                          label="[MLT_Analysis] Plotting og-cluster-size graphs...")
-        colour_map = SpotTools.MplColorHelper('gist_rainbow', self.colour_map_limits[0], self.colour_map_limits[1])
-        # Get the clusters for each layer and add them to a single list
-        layer_cluster_lists = []
-        prog_get_clusters = PrintProgress(0, len(thresholds), label="[MLT_Analysis] Tracking clusters...")
-        for j in range(0, len(thresholds)):
-            layer_cluster_lists.append(self.track_clusters(snapshot_list, thresholds[j],
-                                                           self.max_separation_distance, self.max_time_delta))
-            prog_get_clusters.update()
-        for i in range(0, len(snapshot_list)):
-            fig = plt.figure(figsize=(16, 9), dpi=90)
-            gridspec.GridSpec(2, 3)
-            filename = snapshot_list[i].timestamp.strftime('%Y-%m-%d_%H-%M-%S')
-
-            # Plot image of spot
-            plt.subplot2grid((2, 3), (0, 0), colspan=1, rowspan=2)
-            plt.title(snapshot_list[i].timestamp)
-            roi_plotted = self.plot_roi_on_plt(plt, fig, snapshot_list[i], thresholds, colour_map)
-            if not roi_plotted:
-                continue
-
-            # Plot Angles
-            plt.subplot2grid((2, 3), (0, 1), colspan=2)
-            plt.xlabel("Time (d HH:MM)")
-            plt.ylabel("Major axis angle (deg)")
-            for j in range(0, len(layer_cluster_lists)):
-                self.plot_on_single_graph(plt, layer_cluster_lists[j], thresholds[j], 'angle', colour_map)
-            plt.axvline(matdates.date2num(snapshot_list[i].timestamp), color='black')
-
-            # Plot sizes
-            plt.subplot2grid((2, 3), (1, 1), colspan=2)
-            plt.xlabel("Time (d HH:MM)")
-            plt.ylabel("Area of cluster (sqr pix)")
-            for j in range(0, len(layer_cluster_lists)):
-                self.plot_on_single_graph(plt, layer_cluster_lists[j], thresholds[j], 'size', colour_map)
-            plt.axvline(matdates.date2num(snapshot_list[i].timestamp), color='black')
-
-            # Cleanup and save
-            leg = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            fig.tight_layout()
-            plt.savefig(str(self.og_sizes_graph_path / (filename + '.png')))
-            prog_cluster_size.update()
-
-    def polar_contour_visualiser(self, snapshot_list, thresholds):
-        sim_plot_count = self.stack_plot_memory
-        colour_map = SpotTools.MplColorHelper('gist_rainbow', self.colour_map_limits[0], self.colour_map_limits[1])
-        # Get the clusters for each layer and add them to a single list
-        layer_cluster_lists = []
-        prog_get_clusters = PrintProgress(0, len(thresholds), label="[MLT_Analysis] Tracking clusters...")
-        for j in range(0, len(thresholds)):
-            layer_cluster_lists.append(self.track_clusters(snapshot_list, thresholds[j],
-                                                           self.max_separation_distance, self.max_time_delta))
-            prog_get_clusters.update()
-
-        # Do the plotting
-        prog_cont_vis = PrintProgress(0, len(snapshot_list), label="[MLT_Analysis] Plotting polar contour graphs...")
-        for i in range(0, len(snapshot_list)):
-            fig = plt.figure(figsize=(16, 9), dpi=90)
-            gridspec.GridSpec(4, 3)
-            filename = snapshot_list[i].timestamp.strftime('%Y-%m-%d_%H-%M-%S')
-
-            # Plot image of spot
-            plt.subplot2grid((4, 3), (0, 0), colspan=1, rowspan=4)
-            plt.title(snapshot_list[i].timestamp)
-            roi_plotted = self.plot_roi_on_plt(plt, fig, snapshot_list[i], thresholds, colour_map)
-            if not roi_plotted:
-                continue
-
-            # Plot the first 4 thresholds
-            for k in range(0, 4):
-                plt.subplot2grid((4, 3), (k, 1), colspan=2)
-                plt.xlabel("Azimuthal angle (deg)")
-                plt.ylabel("Radial distance (pix)")
-                lower_bound = i - min(sim_plot_count, i)
-                upper_bound = i + 1
-                self.plot_polar_perimeter(plt, layer_cluster_lists[k], thresholds[k],
-                                        [lower_bound, upper_bound], colour_map)
-
-
-            # Cleanup and save
-            leg = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            fig.tight_layout()
-            plt.savefig(str(self.polar_contour_graph_path / (filename + '.png')))
-            prog_cont_vis.update()
-
     def velocity_against_area_distribution(self, snapshot_list, thresholds):
         """Make a rainbow graph showing all the velocities for each cluster based on distance from centre"""
         colour_map = SpotTools.MplColorHelper(self.colour_map_plots, self.colour_map_limits[0], self.colour_map_limits[1])
@@ -2194,8 +1545,8 @@ class MLT_Analyser:
         prog_get_clusters = PrintProgress(0, len(thresholds), label="[MLT_Analysis] Tracking clusters...")
         for threshold in thresholds:
             if self.tracking_method == "area":
-                tracked_cluster = self.track_one_cluster(snapshot_list, threshold,
-                                                         self.max_separation_distance, cluster_to_track=0)
+                tracked_cluster = self.track_constant_area(snapshot_list, threshold,
+                                                           self.max_separation_distance, cluster_to_track=0)
                 all_cluster_lists.append([tracked_cluster])
             elif self.tracking_method == "threshold":
                 all_cluster_lists.append(self.track_clusters(snapshot_list, threshold,
@@ -2292,8 +1643,8 @@ class MLT_Analyser:
         prog_get_clusters = PrintProgress(0, len(thresholds), label="[MLT_Analysis] Tracking clusters...")
         for threshold in thresholds:
             if self.tracking_method == "area":
-                tracked_cluster = self.track_one_cluster(snapshot_list, threshold,
-                                                         self.max_separation_distance, cluster_to_track=0)
+                tracked_cluster = self.track_constant_area(snapshot_list, threshold,
+                                                           self.max_separation_distance, cluster_to_track=0)
                 all_cluster_lists.append([tracked_cluster])
             elif self.tracking_method == "threshold":
                 all_cluster_lists.append(self.track_clusters(snapshot_list, threshold,
@@ -2362,11 +1713,11 @@ class MLT_Analyser:
                 # Separte list for each cluster. Because of course. Why the @#$% is it done like this?!
                 tracked_clusters = []
                 for i in range(0,self.number_of_clusters_to_track):
-                # tracked_clusters.append(self.track_one_cluster(snapshot_list, threshold,
+                # tracked_clusters.append(self.track_constant_area(snapshot_list, threshold,
                                                                # self.max_separation_distance, cluster_to_track=0))
                     try:
-                        tracked_clusters.append(self.track_one_cluster(snapshot_list, threshold,
-                                                                       self.max_separation_distance, cluster_to_track=i))
+                        tracked_clusters.append(self.track_constant_area(snapshot_list, threshold,
+                                                                         self.max_separation_distance, cluster_to_track=i))
                     except IndexError:
                         Logger.debug("[MLT_Analysis - Area Tracking] Could not find cluster number {0}, skipping...".format(i))
 
@@ -2551,7 +1902,7 @@ class MLT_Analyser:
             distances[i] = []
             for j in range(0,len(parameters_at_threshold[this_index]["time"])):
                 try:
-                    sqr_dist = self.get_euclidean_sqr_dist(parameters_at_threshold[this_index]["centre"][j],
+                    sqr_dist = get_euclidean_sqr_dist(parameters_at_threshold[this_index]["centre"][j],
                                                            parameters_at_threshold[i]["centre"][j])
                     distances[i].append(np.sqrt(sqr_dist))
                 except IndexError:
@@ -2863,107 +2214,6 @@ class MLT_Analyser:
             plt.close(fig)
             prog_make_image.update(self.plotting_stride)
 
-
-    @PendingDeprecationWarning
-    def area_one_graph_cluster_size(self, snapshot_list, thresholds, plots):
-        colour_map = SpotTools.MplColorHelper('gist_rainbow', self.colour_map_limits[0], self.colour_map_limits[1])
-        colour_style = 'normal'
-
-        # Get the clusters
-        all_cluster_lists = []
-        prog_get_clusters = PrintProgress(0, len(thresholds), label="[MLT_Analysis] Tracking clusters...")
-        for threshold in thresholds:
-            if self.tracking_method == "area":
-                # Separte list for each cluster. Because of course. Why the @#$% is it done like this?!
-                tracked_clusters = []
-                tracked_clusters.append(self.track_one_cluster(snapshot_list, threshold,
-                                                               self.max_separation_distance, cluster_to_track=0))
-                try:
-                    tracked_clusters.append(self.track_one_cluster(snapshot_list, threshold,
-                                                                   self.max_separation_distance, cluster_to_track=1))
-                except IndexError:
-                    Logger.debug("[MLT_Analysis - Area Tracking] Only 1 cluster in layer, skipping...")
-                all_cluster_lists.append(tracked_clusters)
-            elif self.tracking_method == "threshold":
-                all_cluster_lists.append(self.track_clusters(snapshot_list, threshold,
-                                                             self.max_separation_distance, self.max_time_delta))
-            prog_get_clusters.update()
-
-        # Get data for ROI
-        if len(plots) == 3:
-            roi_intensities = self.get_roi_intensities(snapshot_list)
-            if plots[2] == 'average_velocity':
-                colour_style = 'faded'
-
-        prog_cluster_size = PrintProgress(0, len(snapshot_list),
-                                          label="[MLT_Analysis] Plotting og-cluster-size graphs...")
-        for i in range(0, len(snapshot_list)):
-            fig = plt.figure(figsize=(16, 9), dpi=90)
-            gridspec.GridSpec(4, 3)
-            filename = snapshot_list[i].timestamp.strftime('%Y-%m-%d_%H-%M-%S')
-            number_of_regions_to_plot = len(all_cluster_lists[0])
-
-            # Plot image of spot
-            plt.subplot2grid((4, 3), (0, 0),
-                             colspan=self.viewport_aspect_ratio[0],
-                             rowspan=self.viewport_aspect_ratio[1])
-            plt.title(snapshot_list[i].timestamp)
-            clusters = []
-            # Dear god that's a deep list. 
-            # In all_clusters_list, are the lists for all clusters ordered by layer threshold.
-            # In these sub layers are all the clusters that share the same layer threshold
-            # in these lists are the cluster objects that correspond to the cluster at a point in time.
-            for threshold_layer in all_cluster_lists:
-                for clusters_in_layer in threshold_layer:
-                    for cluster in clusters_in_layer:
-                        if cluster.datetime == snapshot_list[i].timestamp:
-                            clusters.append(cluster)
-            roi_plotted = self.plot_clusters_on_roi(plt, fig, snapshot_list[i], clusters, colour_map)
-            if not roi_plotted:
-                continue
-
-            # Plot Angles
-            plt.subplot2grid((4, 3), (0, 1), colspan=2, rowspan=number_of_regions_to_plot)
-            plt.xlabel("Time (d HH:MM)")
-            for j in range(0, len(thresholds)):
-                self.plot_on_single_graph(plt, all_cluster_lists[j][0], thresholds[j], plots[0], colour_map, 0)
-            plt.axvline(matdates.date2num(snapshot_list[i].timestamp), color='black')
-
-            if number_of_regions_to_plot == 2:
-                plt.subplot2grid((4, 3), (1, 1), colspan=2, rowspan=number_of_regions_to_plot)
-                plt.xlabel("Time (d HH:MM)")
-                for j in range(0, len(thresholds)):
-                    self.plot_on_single_graph(plt, all_cluster_lists[j][1], thresholds[j], plots[0], colour_map, 0)
-                plt.axvline(matdates.date2num(snapshot_list[i].timestamp), color='black')
-
-            # Plot sizes
-            plt.subplot2grid((4, 3), (2, 1), colspan=2, rowspan=number_of_regions_to_plot)
-            plt.xlabel("Time (d HH:MM)")
-            for j in range(0, len(thresholds)):
-                self.plot_on_single_graph(plt, all_cluster_lists[j][0], thresholds[j], plots[1], colour_map, 1,
-                                          colour_style=colour_style)
-            plt.axvline(matdates.date2num(snapshot_list[i].timestamp), color='black')
-
-            if number_of_regions_to_plot == 2:
-                plt.subplot2grid((4, 3), (3, 1), colspan=2, rowspan=number_of_regions_to_plot)
-                plt.xlabel("Time (d HH:MM)")
-                for j in range(0, len(thresholds)):
-                    self.plot_on_single_graph(plt, all_cluster_lists[j][1], thresholds[j], plots[1], colour_map, 1,
-                                              colour_style=colour_style)
-                plt.axvline(matdates.date2num(snapshot_list[i].timestamp), color='black')
-
-            if len(plots) == 3:
-                if plots[2] == 'global_intensity':
-                    self.plot_on_single_graph(plt, all_cluster_lists[0], thresholds[0], plots[2], colour_map, 1,
-                                              intensities=roi_intensities['darkest'])
-                else:
-                    self.plot_average_parameter(plt, all_cluster_lists, plots[2], 1)
-
-            # Cleanup and save
-            leg = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            fig.tight_layout()
-            plt.savefig(str(self.area_sizes_graph_path / (filename + '.png')))
-            prog_cluster_size.update()
 
     def plot_cluster_histograms(self, snapshot_list, thresholds):
         """
@@ -3285,8 +2535,6 @@ class MLT_Analyser:
         ax.set_ylabel("Rotation activity (arb. units)")
         plt.savefig(self.output_path / filename)
         plt.close()
-
-
 
 
 def mlt_exploded_plot(roi, mlt_layers, xrange=[0,600], yrange=[0,600]):
