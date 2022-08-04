@@ -19,18 +19,18 @@ def fitEllipse_b2ac(x,y):
     general_form_double = b2ac.conversion.conic_to_general_1(conic_double)
     return general_form_double
 
-# def fitEllipse(x,y):
-#     '''Returns the parameters for the best fitting ellipse of points x,y based on Fitzgibbon 1996'''
-#     x = x[:,np.newaxis]
-#     y = y[:,np.newaxis]
-#     D = np.hstack((x*x, x*y, y*y, x, y, np.ones_like(x)))
-#     S = np.dot(D.T,D)
-#     C = np.zeros([6,6])
-#     C[0,2] = C[2,0] = 2; C[1,1] = -1
-#     E, V =  eig(np.dot(inv(S), C))
-#     n = np.argmax(E)
-#     a = V[:,n]
-#     return a
+def fitEllipse(x,y):
+    '''Returns the parameters for the best fitting ellipse of points x,y based on Fitzgibbon 1996'''
+    x = x[:,np.newaxis]
+    y = y[:,np.newaxis]
+    D = np.hstack((x*x, x*y, y*y, x, y, np.ones_like(x)))
+    S = np.dot(D.T,D)
+    C = np.zeros([6,6])
+    C[0,2] = C[2,0] = 2; C[1,1] = -1
+    E, V =  eig(np.dot(inv(S), C))
+    n = np.argmax(E)
+    a = V[:,n]
+    return a
 
 def fitEllipse_Halir_Flusser(x,y):
     """
@@ -48,6 +48,8 @@ def fitEllipse_Halir_Flusser(x,y):
 
     """
     coeffs = ellipse_coeffs_Halir_Flusser(x,y)
+    if len(coeffs) != 6:
+        raise ArithmeticError("Could not fit ellipse to data.")
     centre = ellipse_center(coeffs)
     axes = ellipse_axis_length(coeffs)
     angle = ellipse_angle_of_rotation2(coeffs)

@@ -1,0 +1,23 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter M
+  \item \spxentry{module}
+    \subitem \spxentry{SunspotMain}, \hyperpage{1}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{run\_tracking()}\spxextra{SunspotMain.SunspotMain method}, \hyperpage{1}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{start\_download()}\spxextra{SunspotMain.SunspotMain method}, \hyperpage{1}
+  \item \spxentry{start\_processing()}\spxextra{SunspotMain.SunspotMain method}, \hyperpage{1}
+  \item \spxentry{SunspotMain}
+    \subitem \spxentry{module}, \hyperpage{1}
+  \item \spxentry{SunspotMain}\spxextra{class in SunspotMain}, \hyperpage{1}
+
+\end{sphinxtheindex}

@@ -1,4 +1,6 @@
 # My Libraries
+from numpy.linalg import LinAlgError
+
 import SpotData
 import SpotTools
 import Contours
@@ -9,13 +11,25 @@ import EllipseFit
 # Maths and Phys libs
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mplc
-import matplotlib.dates as matdates
 from pyclustering.cluster.optics import optics
-import scipy.signal._savitzky_golay as sav_gol
 
 # Misc
-import warnings
+from threading import Thread
+
+
+class ThreadWithReturnValue(Thread):
+    def __init__(self, group=None, target=None, name=None,
+                 args=(), kwargs={}, Verbose=None):
+        Thread.__init__(self, group, target, name, args, kwargs)
+        self._return = None
+    def run(self):
+        print(type(self._target))
+        if self._target is not None:
+            self._return = self._target(*self._args,
+                                                **self._kwargs)
+    def join(self, *args):
+        Thread.join(self, *args)
+        return self._return
 
 
 class MultiLevelThresholding():
@@ -83,6 +97,9 @@ class MultiLevelThresholding():
             xx = centre[0] + a * np.cos(R) * np.cos(phi) - b * np.sin(R) * np.sin(phi)
             yy = centre[1] + a * np.cos(R) * np.sin(phi) + b * np.sin(R) * np.cos(phi)
             return elli, xx, yy
+        except LinAlgError:
+            Logger.debug("[MLT - fit_ellipse] Could not find ellipse for given parameters!")
+            return None, None, None
         except ArithmeticError:
             Logger.debug("[MLT - fit_ellipse] Could not find ellipse for given parameters!")
             return None, None, None
@@ -96,8 +113,18 @@ class MultiLevelThresholding():
 
         # Reformat the data to be put into OPTICS and get clusters
         data_formatted = self.extract_data(data_thresh, threshold, use_weighting=self.use_weighting)
+
+        # Put the apply_optics into a thread with a 5 min timeout so it doesn't hang if apply_optics does.
+        # Hacky workaround for issue #6
         Logger.debug("[MLT - make_layer] Applying OPTICS...")
-        cluster_indices, cluster_ordering = self.apply_optics(data_formatted, self.eps, self.min_pts)
+        optics_thread = ThreadWithReturnValue(target=self.apply_optics, args=(data_formatted, self.eps, self.min_pts))
+        optics_thread.start()
+        cluster_result = optics_thread.join(5*60)
+        if cluster_result is None:
+            Logger.log("Warning! OPTICS timed out for layer {0} for data at {1}.".format(threshold_ratio, timestamp))
+            return None
+        cluster_indices, cluster_ordering = cluster_result
+        Logger.debug("[MLT - make_layer] OPTICS complete. Iterating over {0} clusters...".format(len(cluster_indices)))
 
         # Reformat the output of the OPTICS algorithm to use the data coords and not the array indices. Then put the
         # data into a SpotData.Cluster() class to hold the data nicely.
