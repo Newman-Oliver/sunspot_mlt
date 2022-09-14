@@ -86,6 +86,9 @@ class MultiLevelThresholding():
     def fit_ellipse(x_perimeter, y_perimeter):
         """Fit an ellipse to a group of x and y coordinates. Returns 3 values: the ellipse parameters in a list [centre,
         axes, angle to normal], the x coords of the ellipse, the y coords of the ellipse."""
+        if len(x_perimeter) < 7 or len(y_perimeter) < 7:
+            Logger.debug("[MLT_standalone - fit_ellipse] Not enough points in cluster to fit ellipse. Skipping.")
+            return None, None, None
         try:
             elli = EllipseFit.fitEllipse_b2ac(np.transpose(x_perimeter), np.transpose(y_perimeter))
             centre = elli[0]
