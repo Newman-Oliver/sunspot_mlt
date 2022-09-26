@@ -87,10 +87,10 @@ class MultiLevelThresholding():
         """Fit an ellipse to a group of x and y coordinates. Returns 3 values: the ellipse parameters in a list [centre,
         axes, angle to normal], the x coords of the ellipse, the y coords of the ellipse."""
         if len(x_perimeter) < 7 or len(y_perimeter) < 7:
-            Logger.debug("[MLT_standalone - fit_ellipse] Not enough points in cluster to fit ellipse. Skipping.")
+            Logger.debug("[MLT - fit_ellipse] Not enough points in cluster to fit ellipse. Skipping.")
             return None, None, None
         try:
-            elli = EllipseFit.fitEllipse_b2ac(np.transpose(x_perimeter), np.transpose(y_perimeter))
+            elli = EllipseFit.fitEllipse_Halir_Flusser(np.transpose(x_perimeter), np.transpose(y_perimeter))
             centre = elli[0]
             phi = elli[2]
             axes = elli[1]
@@ -245,7 +245,6 @@ class MultiLevelThresholding():
         layers = []
         for threshold in thresholds:
             layers.append(self.make_layer(roi.data, threshold, thresholds_ratio, roi.timestamp,counter_dict))
-        #self.pretty_plot(layers, roi, filename=filename)
         self.plot_layers(layers, roi, filename=filename)
 
     def run_thresholding_on_list(self, spot_list, _threshold_ratios):
@@ -292,9 +291,9 @@ class MultiLevelThresholding():
                     if threshold_ratios[j] in group_layers.layer_thresholds:
                         continue
                 layers.append(self.make_layer(roi.data, threshold, threshold_ratios[j], roi.timestamp, counter_dict))
-            #self.plot_layers(layers, roi, filename=filename)
 
-            #group_layers.layers.extend(layers)
+
+
             for layer in layers:
                 group_layers.add_or_replace_layers(layer)
             group.mlt_path = group_layers.filename

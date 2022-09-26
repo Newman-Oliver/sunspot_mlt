@@ -1,36 +1,11 @@
 import numpy as np
 from numpy.linalg import eig, inv
 
-import b2ac.preprocess
-import b2ac.fit
-import b2ac.conversion
-
-
 '''
-A set of functions designed to fit a set of given points to an ellipse. These functions were outright stolen from
-Nicky van Foreest at http://nicky.vanforeest.com/misc/fitEllipse/fitEllipse.html
-
-Thank you, Nicky. 
+A set of functions designed to fit a set of given points to an ellipse using the method from Halir and Flusser 1998.
+The python implementation below is a modified form of the one written by Nicky van Foreest at 
+http://nicky.vanforeest.com/misc/fitEllipse/fitEllipse.html
 '''
-
-def fitEllipse_b2ac(x,y):
-    points = np.column_stack((x,y))
-    conic_double = b2ac.fit.fit_improved_B2AC_double(points)
-    general_form_double = b2ac.conversion.conic_to_general_1(conic_double)
-    return general_form_double
-
-def fitEllipse(x,y):
-    '''Returns the parameters for the best fitting ellipse of points x,y based on Fitzgibbon 1996'''
-    x = x[:,np.newaxis]
-    y = y[:,np.newaxis]
-    D = np.hstack((x*x, x*y, y*y, x, y, np.ones_like(x)))
-    S = np.dot(D.T,D)
-    C = np.zeros([6,6])
-    C[0,2] = C[2,0] = 2; C[1,1] = -1
-    E, V =  eig(np.dot(inv(S), C))
-    n = np.argmax(E)
-    a = V[:,n]
-    return a
 
 def fitEllipse_Halir_Flusser(x,y):
     """
