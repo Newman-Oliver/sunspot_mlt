@@ -90,7 +90,7 @@ class MultiLevelThresholding():
             Logger.debug("[MLT - fit_ellipse] Not enough points in cluster to fit ellipse. Skipping.")
             return None, None, None
         try:
-            elli = EllipseFit.fitEllipse_Halir_Flusser(np.transpose(x_perimeter), np.transpose(y_perimeter))
+            elli = EllipseFit.fitEllipse_scipy(np.transpose(x_perimeter), np.transpose(y_perimeter))
             centre = elli[0]
             phi = elli[2]
             axes = elli[1]
@@ -140,7 +140,7 @@ class MultiLevelThresholding():
             elli = self.do_ellipse_fit(cluster_coords)
             if elli is None:
                 counter_dict["none_clusters"] = counter_dict["none_clusters"] + 1 if "none_clusters" in counter_dict.keys() else 1
-                Logger.debug("[MLT - make_layer] Ellipse parameters for cluster {0} returned None!".format(cluster))
+                Logger.debug("[MLT - make_layer] Ellipse parameters for cluster {0} returned None!".format(counter_dict["clusters"]))
             clusters.append(SpotData.Cluster(_coordinates=cluster_coords, _datetime=timestamp,
                                              _threshold=threshold, _threshold_ratio=threshold_ratio,
                                              _ellipse_parameters=elli))

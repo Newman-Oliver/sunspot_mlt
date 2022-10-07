@@ -96,6 +96,7 @@ class MLT_Analyser:
         self.dpi = self.config_parser.getint('MLT_Analysis', 'fig_dpi')
         self.fig_font_size = self.config_parser.getint('MLT_Analysis', 'fig_font_size')
         self.label_clusters_on_roi = self.config_parser.getboolean('MLT_Analysis', 'label_clusters_on_roi')
+        self.draw_major_axis_on_roi = self.config_parser.getboolean('MLT_Analysis', 'draw_major_axis_on_roi')
         self.highlight_bad_data = self.config_parser.get('MLT_Analysis', 'highlight_bad_data').strip().lower()
         self.bad_data_ranges = self.config_parser.get_list_as_datetimes('MLT_Analysis', 'bad_data_ranges')
         self.plot_cme_times = self.config_parser.getboolean('MLT_Analysis', 'plot_cme_times')
@@ -875,6 +876,7 @@ class MLT_Analyser:
         parameters['global_intensity'] = []
         parameters['equivalent_radius'] = []
         parameters['ellipticity'] = []
+        parameters['major_axis_length'] = []
         parameters['roi_darkest_intensity'] = []
         parameters['perimeter_length'] = []
         parameters['delta_perimeter'] = []
@@ -916,6 +918,7 @@ class MLT_Analyser:
             parameters['intensity'].append(c.threshold)
             parameters['global_intensity'].append(c.threshold * (1.0 / c.threshold_ratio))
             parameters['ellipticity'].append(self.get_ellipticity(c.ellipse_parameters[1]))
+            parameters['major_axis_length'].append(np.max(c.ellipse_parameters[1]))
             parameters['perimeter_length'].append(len(Contours.getPerimeter(c.points)))
             parameters['polar_perimeter'].append(self.perimeter_polar_coords(Contours.getPerimeter(c.points), c.centre))
             #parameters['perimeter_variance'].append(0 if previous_c is None else self.polar_perimeter_variation(parameters['polar_perimeter'][i],parameters['polar_perimeter'][i-1]))
@@ -1502,6 +1505,11 @@ class MLT_Analyser:
             ellipse_colour = colourmap.get_rgb(cluster.threshold_ratio)
             ellipse_colour = SpotTools.ensure_colour_bright(ellipse_colour)
             ax.plot(xx, yy, c=ellipse_colour, ms=(72. / fig.dpi))
+            if self.draw_major_axis_on_roi:
+                x_maj = elli[0][0] + np.max(elli[1]) * np.cos(elli[2])
+                y_maj = elli[0][1] + np.max(elli[1]) * np.sin(elli[2])
+                Logger.debug("[MLT_Analysis - roi_plot] drawing major axis line for cluster at centre {2} threshold layer {3}: [x_maj,y_maj] = {0} ellipse params = {1}".format((x_maj,y_maj),elli, cluster.centre, cluster.threshold_ratio))
+                ax.plot([elli[0][0], x_maj], [elli[0][1], y_maj], c=ellipse_colour, linestyle='dashed', ms=(72. / fig.dpi))
 
         # Set up Contour plot axes
         ax.set_xlim(self.viewport_ranges[0])
@@ -2163,11 +2171,6 @@ class MLT_Analyser:
          numbers of files"""
         colour_map = SpotTools.MplColorHelper(self.colour_map_plots, self.colour_map_limits[0], self.colour_map_limits[1])
 
-        # Get clusters
-        #all_cluster_lists = self.get_clusters_for_plot(snapshot_list, thresholds)
-        # all_cluster_lists = self.multi_track_clusters(snapshot_list, thresholds)
-        # all_cluster_lists = self.sort_all_cluster_list(all_cluster_lists, thresholds)
-        
         # Get Parameters
         parameters = self.get_paramters(snapshot_list, thresholds, range(0, self.number_of_clusters_to_track))
 
@@ -2206,8 +2209,20 @@ class MLT_Analyser:
                                 txt = ax.text(centre[0] + 10.0, centre[1] - 10.0, '{0}'.format(spot[0]))
                                 txt.set_path_effects([PathEffects.withStroke(linewidth=2, foreground='w')])
                                 clusters_with_text_plotted.append(spot[0])
-            
-            #leg = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+            # Plot a line denoting the major axis of each cluster.
+            # TODO: should move this into the same loop as the one above so all these checks are done at the same time.
+            # if self.draw_major_axis_on_roi:
+            #     for threshold in parameters:
+            #         for spot in threshold.items():
+            #             centre, angle, axis_length, threshold_ratio = self.get_parameter_at_time(spot[1], snapshot_list[i].timestamp, ['centre', 'angle', 'major_axis_length','threshold_ratio'])
+            #             if centre is not None and angle is not None and axis_length is not None:
+            #                 line = SpotTools.getPointsOnLine(centre, axis_length+3, np.deg2rad(angle), from_centre=False)
+            #                 Logger.debug("[MLT_Analysis - ROI_plot] centre of spot: {0} angle (deg): {3} major axis line points: x[{1}], y[{2}]".format(centre, line[0, :], line[1, :], angle))
+            #                 # Maybe should be a line graph between two end points instead?
+            #                 ax.scatter(line[0, :], line[1, :], marker='.', c=colour_map.get_rgb(threshold_ratio))
+
+                            #leg = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             fig.colorbar(colour_map.scalarMap)
             fig.tight_layout()
             plt.savefig(str(self.roi_plot_path / (filename + '.png')))

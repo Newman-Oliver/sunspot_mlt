@@ -1,11 +1,34 @@
 import numpy as np
 from numpy.linalg import eig, inv
+from skimage.measure import EllipseModel
 
 '''
 A set of functions designed to fit a set of given points to an ellipse using the method from Halir and Flusser 1998.
 The python implementation below is a modified form of the one written by Nicky van Foreest at 
 http://nicky.vanforeest.com/misc/fitEllipse/fitEllipse.html
 '''
+
+def fitEllipse_scipy(x,y):
+    """
+    Find the best fitting ellipse for a given set of x and y coordinates. Uses the direct least squares approach of
+    Halir and Flusser (1998) http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.1.7559
+
+    SciPy implementation
+
+    Args:
+        x: ndarray. x-coordinates
+        y: ndarray. y-coordinates
+
+    Returns: tuple. Contains the centre coordinates, length of major/minor axes, and rotation angle (in radians).
+    """
+    if len(x) < 7:
+        raise ArithmeticError("Too few data points. Could not fit ellipse to data.")
+    ellipse = EllipseModel()
+    ellipse.estimate(np.array(list(zip(x,y))))
+    if ellipse.params is None:
+        raise ArithmeticError("Could not fit ellipse to data.")
+    xc, yc, a, b, theta = ellipse.params
+    return ((xc, yc), (a,b), theta)
 
 def fitEllipse_Halir_Flusser(x,y):
     """

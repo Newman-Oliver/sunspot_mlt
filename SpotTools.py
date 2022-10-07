@@ -269,7 +269,7 @@ def getPointsOnLine(centre, radius, angle, from_centre=True):
         else:
             output = bresenhamHigh(x0, y0, x1, y1)
 
-    return output
+    return np.array(output)
 
 def first(iterable, default=None, key=None):
     if key is None:

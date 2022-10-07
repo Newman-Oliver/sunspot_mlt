@@ -58,7 +58,7 @@ def fit_ellipse(x_perimeter, y_perimeter):
     """Fit an ellipse to a group of x and y coordinates. Returns 3 values: the ellipse parameters in a list [centre,
     axes, angle to normal], the x coords of the ellipse, the y coords of the ellipse."""
     try:
-        elli = EllipseFit.fitEllipse_b2ac(np.transpose(x_perimeter), np.transpose(y_perimeter))
+        elli = EllipseFit.fitEllipse_Halir_Flusser(np.transpose(x_perimeter), np.transpose(y_perimeter))
         centre = elli[0]
         phi = elli[2]
         axes = elli[1]
