@@ -791,7 +791,7 @@ class MLT_Analyser:
         return velocities
 
     def get_ellipticity(self, axes):
-        return (axes[1] - axes[0]) / axes[1]
+        return (max(axes) - min(axes)) / max(axes)
 
     def differentiate_parameter(self, parameter, timestamp_list, stride, do_smooth=False, abs_threshold=None, relative=False):
         """
@@ -865,6 +865,7 @@ class MLT_Analyser:
         parameters = {}
         parameters['time'] = []
         parameters['matplot_time'] = []
+        parameters['raw_angle'] = []
         parameters['angle'] = []
         parameters['size'] = []
         parameters['centre'] = []
@@ -923,6 +924,7 @@ class MLT_Analyser:
             parameters['polar_perimeter'].append(self.perimeter_polar_coords(Contours.getPerimeter(c.points), c.centre))
             #parameters['perimeter_variance'].append(0 if previous_c is None else self.polar_perimeter_variation(parameters['polar_perimeter'][i],parameters['polar_perimeter'][i-1]))
             angle = (c.ellipse_parameters[2] / (2 * np.pi)) * 360.
+            parameters['raw_angle'].append(angle)
             # Remove wrapping around -90/90
             try:
                 last_angle = parameters['angle'][i - 1]
@@ -1041,16 +1043,36 @@ class MLT_Analyser:
 
 
     def fix_wrapping(self, angle, last_angle):
-        """Stop wrapping around -90/90 and instead wrap around -180/180"""
+        """Fix discontinuities due to 90 deg and 180 degree ambiguity."""
         if angle is None or last_angle is None:
             return angle
-        difference_too_large = abs(last_angle - angle) > self.param_tolerances['velocity']
-        if last_angle < 0 and angle > 0 and difference_too_large:
-            return angle - 180
-        if last_angle > 0 and angle < 0 and difference_too_large:
-            return angle + 180
+        difference = abs(last_angle - angle)
+        correction = 0
+        difference_too_large = False
+        # Check for 180 or 90 degree rebound. Little bit of wiggle room for detection ~10deg.
+        if difference > 170.:
+             difference_too_large = True
+             correction = 180
+        elif difference > 80.:
+             difference_too_large = True
+             correction = 90
+        # Apply Correction
+        if difference_too_large:
+            if last_angle < angle:
+                return angle - correction
+            else:
+                return angle + correction
+            # if last_angle < 0 and angle > 0:
+            #     return angle - correction
+            # if last_angle < 0 and angle < 0:
+            #     return angle + correction
+            # if last_angle >= 0 and angle >= 0:
+            #     return angle - correction
+            # if last_angle >= 0 and angle <= 0:
+            #     return angle + correction
         else:
             return angle
+
 
 
     def angles_on_axis(self, plt, cluster_list, layer, plot_index):
@@ -1474,19 +1496,22 @@ class MLT_Analyser:
         #ax = plt.axes()
 
         # Plot background
+        Logger.debug("[MLT_Analysis - plot_clusters_on_roi] Plotting background ROI image for \"{0}\".".format(snapshot.ROI_path))
         ax.imshow(roi.data, cmap=self.colour_map_spot, aspect='auto')
 
         # Plot contours for the given clusters
         for cl in clusters:
             cluster = self.path_man.get_cluster_from_id(cl)
             if cluster is None:
-                Logger.log("[MLT_Analysis - plot_clusters_on_roi] WARN: Cluster \'{0}\' returned as None".format(cl))
+                Logger.debug("[MLT_Analysis - plot_clusters_on_roi] WARN: Failed to get cluster from id: Cluster \'{0}\' returned as None".format(cl))
                 continue
             if len(cluster.points) < 10:
                 # Reject because too small
+                Logger.debug("[MLT_Analysis - plot_clusters_on_roi] Cluster \"{0}\" too small to plot. Skipping".format(cluster.id))
                 continue
 
             # Attempt at plotting only the perimeter
+            Logger.debug("[MLT_Analysis - plot_clusters_on_roi] Plotting cluster \"{0}\".".format(cluster.id))
             perimeter = Contours.getPerimeter(cluster.points)
             # TODO Make this into arcsec.
             # change perimeter from a list of [[x,y], ...] coords to a list of [[x],[y]] coords.
@@ -1498,6 +1523,7 @@ class MLT_Analyser:
             # Getting Ellipse fit
             elli, xx, yy = MLT.MultiLevelThresholding.fit_ellipse(perimeter[0], perimeter[1])
             if elli is None:
+                Logger.debug("[MLT_Analysis - plot_clusters_on_roi] Ellipse fit parameters returned None. Skipping...")
                 continue
 
             # Record parameters and plot.
@@ -1506,10 +1532,16 @@ class MLT_Analyser:
             ellipse_colour = SpotTools.ensure_colour_bright(ellipse_colour)
             ax.plot(xx, yy, c=ellipse_colour, ms=(72. / fig.dpi))
             if self.draw_major_axis_on_roi:
-                x_maj = elli[0][0] + np.max(elli[1]) * np.cos(elli[2])
-                y_maj = elli[0][1] + np.max(elli[1]) * np.sin(elli[2])
-                Logger.debug("[MLT_Analysis - roi_plot] drawing major axis line for cluster at centre {2} threshold layer {3}: [x_maj,y_maj] = {0} ellipse params = {1}".format((x_maj,y_maj),elli, cluster.centre, cluster.threshold_ratio))
-                ax.plot([elli[0][0], x_maj], [elli[0][1], y_maj], c=ellipse_colour, linestyle='dashed', ms=(72. / fig.dpi))
+                Logger.debug(
+                    "[MLT_Analysis - roi_plot] drawing major axis line for cluster at centre {1} threshold layer {2} ellipse params = {0}".format(
+                        elli, cluster.centre, cluster.threshold_ratio))
+                # Plotting using coordinates from the parametric eq. used to plot the ellipse
+                sqr_dists = [(xx[i] - elli[0][0])**2 + (yy[i] - elli[0][1])**2 for i in range(len(xx))]
+                maj_axis_index = np.argmax(sqr_dists)
+                maj_axis_coords = [xx[maj_axis_index], yy[maj_axis_index]]
+                Logger.debug("[MLT_Analysis - roi_plot] Parametric method coords: {0}".format(maj_axis_coords))
+                ax.plot([elli[0][0], maj_axis_coords[0]], [elli[0][1], maj_axis_coords[1]], c=ellipse_colour, linestyle='dashed',
+                        ms=(72. / fig.dpi))
 
         # Set up Contour plot axes
         ax.set_xlim(self.viewport_ranges[0])
@@ -2036,6 +2068,9 @@ class MLT_Analyser:
                                        + " threshold {0} and spot_index {1} ".format(k, spot_index)
                                        + "after plot_on_single_graph! Attempting to continue with original data...")
                             params = parameters[k][spot_index]
+                        # Print the data to the log file for debug
+                        Logger.debug("[MLT_Analysis - multi_parameter_plot] {0} for spot {1} at layer {2}: {3}".format(plot_type, spot_index, thresholds[k], params[plot_type]))
+                        Logger.debug("[MLT_Analysis - multi_parameter_plot] raw_angles: {0}".format(params['raw_angle']))
                         if do_average_plot:
                             # collect data, making sure every value is attributed to the correct timestamp
                             for l in range(0,len(params['time'])):
@@ -2463,7 +2498,7 @@ class MLT_Analyser:
             if mlt is None:
                 continue
             timestamps.append(snapshot_list[i].timestamp)
-            for threshold_ratio in np.flip(thresholds):
+            for threshold_ratio in np.flip(thresholds, axis=0):
                 layer = mlt.find_layer_by_threshold(threshold_ratio)
                 cluster_count = 0 if layer is None else len(layer.mlt_clusters)
                 if threshold_ratio in clusters_per_layer:

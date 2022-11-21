@@ -24,7 +24,10 @@ def fitEllipse_scipy(x,y):
     if len(x) < 7:
         raise ArithmeticError("Too few data points. Could not fit ellipse to data.")
     ellipse = EllipseModel()
-    ellipse.estimate(np.array(list(zip(x,y))))
+    data_to_fit = np.array(list(zip(x,y)))
+    ellipse.estimate(data_to_fit)
+    # TODO: check residuals?
+    # residuals = ellipse.residuals(data_to_fit)
     if ellipse.params is None:
         raise ArithmeticError("Could not fit ellipse to data.")
     xc, yc, a, b, theta = ellipse.params
