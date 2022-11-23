@@ -925,13 +925,6 @@ class MLT_Analyser:
             #parameters['perimeter_variance'].append(0 if previous_c is None else self.polar_perimeter_variation(parameters['polar_perimeter'][i],parameters['polar_perimeter'][i-1]))
             angle = (c.ellipse_parameters[2] / (2 * np.pi)) * 360.
             parameters['raw_angle'].append(angle)
-            # # Remove wrapping around -90/90
-            # try:
-            #     last_angle = parameters['angle'][i - 1]
-            #     angle = self.fix_wrapping(angle, last_angle)
-            # except IndexError:
-            #     pass
-            # parameters['angle'].append(angle)
         prog_extraction.update()  # Add update at the end for final tick to 100%
 
         # Correct for 180 deg ambiguity *after* the loop. Doing it inside the loop didn't work.
@@ -941,9 +934,10 @@ class MLT_Analyser:
                 ambiguity_fix.append(parameters['raw_angle'][0])
                 continue
             ambiguity_fix.append(self.fix_wrapping(parameters['raw_angle'][i], ambiguity_fix[i-1]))
-        if spot_index == 0:
-            Logger.debug("[MLT_Analysis - get_parameters] angle ambiguity framewise fix: ambiguity_fix = {0}".format(ambiguity_fix))
-            Logger.debug("[MLT_Analysis - get_parameters] angle ambiguity framewise fix: parameters[\'raw_angle\'] = {0}".format(parameters['raw_angle']))
+        # For debugging angle values. Makes very big log files by printing angle and raw_angle arrays. Disable unless needed
+        # if spot_index == 0:
+        #     Logger.debug("[MLT_Analysis - get_parameters] angle ambiguity framewise fix: ambiguity_fix = {0}".format(ambiguity_fix))
+        #     Logger.debug("[MLT_Analysis - get_parameters] angle ambiguity framewise fix: parameters[\'raw_angle\'] = {0}".format(parameters['raw_angle']))
         parameters['angle'] = ambiguity_fix
 
         Logger.log("[MLT_Analysis - get_cluster_parameters] None cluster count: {0}".format(none_clusters))
