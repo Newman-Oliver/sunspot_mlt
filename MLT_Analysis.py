@@ -1545,6 +1545,16 @@ class MLT_Analyser:
         ax.set_xlim(self.viewport_ranges[0])
         ax.set_ylim(self.viewport_ranges[1])
         if self.output_format == 'print':
+            # Check if ROI object has centre coords
+            if roi.centre_arcsec is None:
+                fix_roi_metadata = snapshot.setRoiCentre(roi)
+                if fix_roi_metadata:
+                    Logger.log("[MLT_Analysis - plot_clusters_on_roi] Warning! Metadata for roi file {0}".format(roi.filename)
+                               + " is incomplete! This has been temporarily fixed. To make this fix permenant,"
+                               + " enable the \'check_ROI_headers\' config option on the next run.")
+                 else:
+                    Logger.log("[MLT_Analysis - plot_clusters_on_roi] ERROR: Metadata for roi file {0}".format(roi.filename)
+                               + " does not exist for centre_arcsec coords!"
             xticks = ax.get_xticklabels()
             Logger.debug("[ROI_Plot] x-axis tick labels: {0}".format(xticks))
             xtick_range = self.viewport_ranges[0][1] * roi.pixel_scale[0] -\
