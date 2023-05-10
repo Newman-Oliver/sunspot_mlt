@@ -175,6 +175,27 @@ class GroupSnapshot():
             return coord
         return SkyCoord(coord[0]*u.arcsec, coord[1]*u.arcsec,
                         obstime=self.timestamp, frame=frames.Helioprojective)
+    
+    def setRoiCentre(self, roi):
+        """
+        Set the centre coord values in the designated ROI object using this group's values if they exist.
+        Must specify roi object as parameter because there is no object reference to the ROI in this class. 
+        Used to fix ROI objects with missing metadata.
+        """
+        errs = 0
+        if self.centre is not None:
+            roi.centre = self.centre
+            Logger.log("[SpotData - GroupSnapshot] ROI centre updated.")
+        else:
+            Logger.log("[SpotData - GroupSnapshot] ERR: Centre co-ordinates are None in GroupSnapshot, could not update ROI. Tracking may need to be redone.")
+            errs += 1
+        if self.centre_arcsec is not None:
+            roi.centre_arcseec = self.centre_arcsec
+            Logger.log("[SpotData - GroupSnapshot] ROI centre_arcsec updated")
+        else:
+            Logger.log("[SpotData - GroupSnapshot] ERR: Centre_arcsec co-ordinates are None in GroupSnapshot, could not update ROI. Tracking may need to be redone.")
+            errs += 1
+        return True if errs == 0 else False
 
 
 
