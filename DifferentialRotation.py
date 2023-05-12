@@ -114,7 +114,7 @@ class DiffRot():
                                snapshot.qsun_intensity,
                                snapshot.timestamp,
                                _pixel_scale=pixel_scale,
-                               _centre_arcsec=snapshot.centre_arcsec
+                               _centre_arcsec=snapshot.centre_arcsec,
                                _centre=snapshot.centre)
             snapshot.ROI_path = snapshot.timestamp.strftime('%Y-%m-%d_%H-%M-%S')
             #self.plotROI(cmp, cmp.date, [(roi_xMin+2048,roi_yMin+2048), 2*minROI[0], 2*minROI[1]])
