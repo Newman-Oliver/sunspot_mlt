@@ -1,4 +1,3 @@
-
 import numpy as np
 import astropy.units as u
 import matplotlib.ticker as tkr
@@ -139,7 +138,6 @@ class MLT_Analyser:
                               'centre': 'Centre position (pix)',
                               'interpolated_velocity': r'(intrp) $\omega$ ($^\circ h^{-1}$)',
                               'smoothed_angle': r'(smoothed) $\theta$ ($^\circ$)',
-                              'weighted_angle': r'(weighted) $\theta$ ($^\circ$)',
                               'perimeter_length': 'Perim. length (pix)',
                               'delta_perimeter': r'$\Delta$ Perim. Length',
                               'delta_size': r'$\Delta \sqrt{Area}$ (pix)',
@@ -763,29 +761,6 @@ class MLT_Analyser:
             interp_velocities.append(velocity)
         return interp_velocities
 
-    def get_weighted_angles(self,thresholds, angles, timestamp_list):
-        num_timestamp = len(timestamp_list)
-        num_angles = len(angles)
-        num_thresholds = len(thresholds)
-
-        weighted_angles = np.zeros((num_timestamp, num_thresholds))
-        sigma = 0.01 # Standard Deviation
-
-        for i in range(num_timestamp):
-            for j in range(num_thresholds):
-                a = 0
-                b = 0
-                for k in range(num_angles):
-                    threshold_index = k % num_thresholds
-                    a += angles[k] * np.exp(-0.5 * (((thresholds[j] - thresholds[threshold_index]) / sigma) ** 2))
-                    b += np.exp(-0.5 * (((thresholds[j] - thresholds[threshold_index]) / sigma) ** 2))
-                if b != 0:  # Check if b is not zero before division
-                    weighted_angle = a / b
-                else:
-                    weighted_angle = np.nan
-                weighted_angles[i, j] = weighted_angle
-        return weighted_angles
-
     def get_angular_velocity(self, timestamp_list, angle_list, delta_angles, stride):
         velocities = []
         if len(angle_list) < 11:
@@ -818,7 +793,7 @@ class MLT_Analyser:
     def get_ellipticity(self, axes):
         return (max(axes) - min(axes)) / max(axes)
 
-    def differentiate_parameter(self, parameter, timestamp_list, stride, do_smooth=True, abs_threshold=None, relative=False):
+    def differentiate_parameter(self, parameter, timestamp_list, stride, do_smooth=False, abs_threshold=None, relative=False):
         """
         Returns the differential of the given parameter, replacing outliers with NaNs if abs_threshold specified.
         :param parameter:
@@ -992,10 +967,8 @@ class MLT_Analyser:
         # Sum up all the changes in parameters as a benchmark for how consistent a cluster is over time.
         parameters['cluster_instability'] = [parameters['delta_perimeter'][i] + parameters['delta_size'][i] + parameters['delta_ellipticity'][i] for i in range(len(parameters['delta_perimeter']))]
         parameters['velocity'] = self.differentiate_parameter(parameters['smoothed_angle'], parameters['time'],
-                                                              self.velocity_stride, do_smooth=True,
+                                                              self.velocity_stride, do_smooth=False,
                                                               abs_threshold=None)
-        parameters["weighted_angle"] = self.get_weighted_angles(thresholds, parameters['angle'], parameters['time'])
-
         if self.do_velocity_filter:
             parameters["interpolated_velocity"] = self.get_interpolated_velocity(parameters)
 
@@ -1086,7 +1059,7 @@ class MLT_Analyser:
         if difference > 170.:
              difference_too_large = True
              correction = 180
-        elif difference > 60.:
+        elif difference > 80.:
              difference_too_large = True
              correction = 90
         # Apply Correction
@@ -1100,7 +1073,7 @@ class MLT_Analyser:
 
 
 
-    def angles_on_axis(self, plt, cluster_list, value, layer, plot_index):
+    def angles_on_axis(self, plt, cluster_list, layer, plot_index):
         """Given pyplot window, plot the graph of major axis angle against time for all clusters that are large
         enough."""
         count_plotted = 0
@@ -1579,9 +1552,9 @@ class MLT_Analyser:
                     Logger.log("[MLT_Analysis - plot_clusters_on_roi] Warning! Metadata for roi file {0}".format(roi.filename)
                                + " is incomplete! This has been temporarily fixed. To make this fix permenant,"
                                + " enable the \'check_ROI_headers\' config option on the next run.")
-                else:
+                 else:
                     Logger.log("[MLT_Analysis - plot_clusters_on_roi] ERROR: Metadata for roi file {0}".format(roi.filename)
-                               + " does not exist for centre_arcsec coords!")
+                               + " does not exist for centre_arcsec coords!"
             xticks = ax.get_xticklabels()
             Logger.debug("[ROI_Plot] x-axis tick labels: {0}".format(xticks))
             xtick_range = self.viewport_ranges[0][1] * roi.pixel_scale[0] -\
@@ -1923,10 +1896,7 @@ class MLT_Analyser:
         # Plot the data
         for s in range(len(spot)):
             data_values = spot[s]
-            spot_index, plot_type = plots_details[j]
-            colour_style = 'normal'
             for timestamp in data_values:
-                #data_values[timestamp] = np.average(data_values[timestamp],weights=[1,2,3,5,3,2,1])
                 data_values[timestamp] = np.mean(data_values[timestamp])
             data_values = dict(sorted(data_values.items(), key=lambda item: item[0]))
             ax.plot_date(data_values.keys(), list(data_values.values()),
@@ -1967,7 +1937,7 @@ class MLT_Analyser:
             for time in self.cme_times:
                 ax.axvline(matdates.date2num(time), lw=1, color="red", linestyle='dotted')
 
-        #plt.legend()
+        plt.legend()
         plt.tight_layout()
 
         plt.savefig(str(self.single_graph_path / filename))
@@ -2230,7 +2200,7 @@ class MLT_Analyser:
 
 
             #graphs[-1].set_xlabel("Time (Day / HH:MM)")
-            #fig.colorbar(colour_map.scalarMap)
+            fig.colorbar(colour_map.scalarMap)
             # Tidy up, plot, and save
             plt.tight_layout()
             #leg = graphs[0].legend(bbox_to_anchor=(1.05, 1.0), loc=2)
@@ -2296,7 +2266,7 @@ class MLT_Analyser:
             #                 ax.scatter(line[0, :], line[1, :], marker='.', c=colour_map.get_rgb(threshold_ratio))
 
                             #leg = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            #fig.colorbar(colour_map.scalarMap)
+            fig.colorbar(colour_map.scalarMap)
             fig.tight_layout()
             plt.savefig(str(self.roi_plot_path / (filename + '.png')))
             plt.close(fig)
@@ -2623,6 +2593,7 @@ class MLT_Analyser:
         ax.set_ylabel("Rotation activity (arb. units)")
         plt.savefig(self.output_path / filename)
         plt.close()
+
 
 def mlt_exploded_plot(roi, mlt_layers, xrange=[0,600], yrange=[0,600]):
     """Produces a 3d plot showing the sunspot at the 0th level, then stacking MLT layers on the Z axis."""

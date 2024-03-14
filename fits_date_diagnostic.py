@@ -4,9 +4,9 @@ import datetime
 import matplotlib.dates as matdates
 
 plt.switch_backend('Agg')
-# /scratch/a.rig12/sunspots/NOAA_12172-2min/fits
-file_path = Path("/mnt/alpha/work/PhD/DataArchive/full-disk/2010-hourly/fits")
-output_path = Path("/mnt/alpha/work/PhD/DataArchive/full-disk/2010-hourly/output/")
+# /scratch/a.oln2/sunspots/NOAA_12565_test/fits
+file_path = Path("/scratch/a.oln2/sunspots/NOAA_12565_test/fits")
+output_path = Path("/scratch/a.oln2/sunspots/NOAA_12565_test/output/")
 
 files = [x for x in file_path.glob('*.fits') if x.is_file()]
 dates = []

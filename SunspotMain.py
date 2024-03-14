@@ -100,7 +100,7 @@ class SunspotMain():
             self.start_download()
 
         # Do NOT attempt processing on head node
-        if not self.hostname.startswith('sl'):
+        if not self.hostname.startswith('XX'):
             runtime_tot = Logger.Runtime(label='Total Runtime: ')
             self.start_processing()
             if self.rank == 0: runtime_tot.print()

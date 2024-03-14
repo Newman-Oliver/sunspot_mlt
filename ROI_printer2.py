@@ -22,8 +22,8 @@ def plot_all_cmaps(roiList, cmaps, dir):
         fig = plt.figure(figsize=(3,3),dpi=300)
         ax = plt.subplot()
         img = ax.imshow(roi.data, cmap='Greys_r')
-        plt.xlim([600,000])
-        plt.ylim([600,000])
+        plt.xlim([800,300])
+        plt.ylim([600,200])
         plt.xlabel("Distance (pix)")
         plt.ylabel("Distance (pix)")
         plt.tight_layout()
@@ -34,6 +34,6 @@ if __name__ == "__main__":
     # Switch backend becaue tkinter doesn't like scw's headless environment.
     plt.switch_backend('Agg')
 
-    sd = SpotData.SpotData('/home/a.oln2/sunspots/NOAA_13590/')
+    sd = SpotData.SpotData('/home/a.oln2/sunspots/NOAA_11520')
     roiList = sd.loadROIList(sd.getDir('roi'))
-    plot_all_cmaps(roiList, my_cmaps, '/home/a.oln2/sunspots/NOAA_13590/output/roi_visualised/')
+    plot_all_cmaps(roiList, my_cmaps, '/home/a.oln2/sunspots/NOAA_11520/output/roi_visualised/')

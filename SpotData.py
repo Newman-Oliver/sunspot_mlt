@@ -695,7 +695,11 @@ class SpotData():
             if snapshot.ROI_path is None:
                 Logger.debug("[Check ROI] Could not find ROI for spot {0}.".format(snapshot.filename))
                 continue
-            roi = self.loadROI(snapshot.ROI_path)
+            try:
+                roi = self.loadROI(snapshot.ROI_path)
+            except FileNotFoundError:
+                Logger.log("[SpotData - check_roi_headers] ROI referenced but not found, was it moved or deleted? Skipping...")
+                continue
 
             # If the ROI doesn't have a required attribute, give it one so it'll load and then fix it.
             # Not sure why this needs it but it didn't need it when I ran the code at home. Maybe difference

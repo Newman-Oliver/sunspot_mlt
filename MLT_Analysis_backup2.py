@@ -1,4 +1,3 @@
-
 import numpy as np
 import astropy.units as u
 import matplotlib.ticker as tkr
@@ -139,7 +138,6 @@ class MLT_Analyser:
                               'centre': 'Centre position (pix)',
                               'interpolated_velocity': r'(intrp) $\omega$ ($^\circ h^{-1}$)',
                               'smoothed_angle': r'(smoothed) $\theta$ ($^\circ$)',
-                              'weighted_angle': r'(weighted) $\theta$ ($^\circ$)',
                               'perimeter_length': 'Perim. length (pix)',
                               'delta_perimeter': r'$\Delta$ Perim. Length',
                               'delta_size': r'$\Delta \sqrt{Area}$ (pix)',
@@ -763,29 +761,6 @@ class MLT_Analyser:
             interp_velocities.append(velocity)
         return interp_velocities
 
-    def get_weighted_angles(self,thresholds, angles, timestamp_list):
-        num_timestamp = len(timestamp_list)
-        num_angles = len(angles)
-        num_thresholds = len(thresholds)
-
-        weighted_angles = np.zeros((num_timestamp, num_thresholds))
-        sigma = 0.01 # Standard Deviation
-
-        for i in range(num_timestamp):
-            for j in range(num_thresholds):
-                a = 0
-                b = 0
-                for k in range(num_angles):
-                    threshold_index = k % num_thresholds
-                    a += angles[k] * np.exp(-0.5 * (((thresholds[j] - thresholds[threshold_index]) / sigma) ** 2))
-                    b += np.exp(-0.5 * (((thresholds[j] - thresholds[threshold_index]) / sigma) ** 2))
-                if b != 0:  # Check if b is not zero before division
-                    weighted_angle = a / b
-                else:
-                    weighted_angle = np.nan
-                weighted_angles[i, j] = weighted_angle
-        return weighted_angles
-
     def get_angular_velocity(self, timestamp_list, angle_list, delta_angles, stride):
         velocities = []
         if len(angle_list) < 11:
@@ -994,8 +969,6 @@ class MLT_Analyser:
         parameters['velocity'] = self.differentiate_parameter(parameters['smoothed_angle'], parameters['time'],
                                                               self.velocity_stride, do_smooth=True,
                                                               abs_threshold=None)
-        parameters["weighted_angle"] = self.get_weighted_angles(thresholds, parameters['angle'], parameters['time'])
-
         if self.do_velocity_filter:
             parameters["interpolated_velocity"] = self.get_interpolated_velocity(parameters)
 
@@ -1100,7 +1073,7 @@ class MLT_Analyser:
 
 
 
-    def angles_on_axis(self, plt, cluster_list, value, layer, plot_index):
+    def angles_on_axis(self, plt, cluster_list, layer, plot_index):
         """Given pyplot window, plot the graph of major axis angle against time for all clusters that are large
         enough."""
         count_plotted = 0
@@ -2623,6 +2596,7 @@ class MLT_Analyser:
         ax.set_ylabel("Rotation activity (arb. units)")
         plt.savefig(self.output_path / filename)
         plt.close()
+
 
 def mlt_exploded_plot(roi, mlt_layers, xrange=[0,600], yrange=[0,600]):
     """Produces a 3d plot showing the sunspot at the 0th level, then stacking MLT layers on the Z axis."""
