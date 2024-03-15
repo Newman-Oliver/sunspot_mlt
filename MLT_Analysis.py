@@ -84,6 +84,11 @@ class MLT_Analyser:
         self.median_filter_window_size = self.config_parser.getint('MLT_Tolerances', 'median_filter_window_size')
         self.flare_times = self.config_parser.get_list_as_datetimes('Options', 'flare_times')
         self.cme_times = self.config_parser.get_list_as_datetimes('Options', 'cme_times')
+        # Placeholder value here for the threshold weights. Could add to the config file if you want.
+        # The threshold values aren't known here yet, as they are passed in to the run function by the
+        # main script, so we can't just calculate them here. Instead I'll give this a placeholder
+        # value and calculate them in the run function.
+        self.threshold_weights = None
 
         self.velocity_stride = self.config_parser.getint('MLT_Analysis', 'velocity_stride')
         self.angles_normalise = self.config_parser.get('MLT_Analysis', 'angles_normalise')
@@ -186,6 +191,9 @@ class MLT_Analyser:
             start = 0
         else:
             start -= self.velocity_stride
+        # Calculate the weights here, now that thresholds has a value
+        self.threshold_weights = self.calculate_threshold_weights(thresholds)
+        
         if self.graph_type == 'velocity_area_distribution':
             self.velocity_against_area_distribution(sunspot_group.history[start:stop], thresholds)
         elif self.graph_type == 'velocity_area':
@@ -994,7 +1002,7 @@ class MLT_Analyser:
         parameters['velocity'] = self.differentiate_parameter(parameters['smoothed_angle'], parameters['time'],
                                                               self.velocity_stride, do_smooth=True,
                                                               abs_threshold=None)
-        parameters["weighted_angle"] = self.get_weighted_angles(thresholds, parameters['angle'], parameters['time'])
+        #parameters["weighted_angle"] = self.get_weighted_angles(thresholds, parameters['angle'], parameters['time'])
 
         if self.do_velocity_filter:
             parameters["interpolated_velocity"] = self.get_interpolated_velocity(parameters)
@@ -1396,6 +1404,23 @@ class MLT_Analyser:
         if len(list_indices) == 0:
             return None
         return list_indices
+
+    def calculate_threshold_weights(self, thresholds):
+        """
+        Calculates the weighting value for each threshold. This determines how much the parametter values for 
+        different thresholds affect the overall average. Returns a dictionary mapping the threshold value to a 
+        specific weighting.
+        """
+        # You can add in whatever weighting function you want, as long as it returns as a 1d list.
+        # All equal weighting
+        weights = np.ones(len(thresholds))
+        # Linear (outer thresholds have more weight)
+        # weights = np.linspace(thresholds[0], thresholds[-1], num=len(thresholds))
+
+        # Then map the threshold values to the weighting in a dict
+        weight_map = dict(zip(thresholds,weights))
+        Logger.log("[MLT_Analysis - calculate_threshold_weights] - Threshold weights calculated: {0}".format(weight_map))
+        return weight_map
 
     def plot_average_parameter(self, plt, cluster_list, plot_type, plot_index):
         """A different implementation of plot_on_single_graph that allows for the average of parameters in different
