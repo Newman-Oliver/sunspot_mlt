@@ -1014,6 +1014,10 @@ class MLT_Analyser:
         #parameters["weighted_angle"] = self.get_weighted_angles(thresholds, parameters['angle'], parameters['time'])
 
         threshold_weights = self.calculate_threshold_weights(thresholds)
+        print("Thresholds:", thresholds)
+        print("Smoothed angles:", parameters['smoothed_angle'])
+        for threshold, weight in threshold_weights.items():
+            print("Threshold weight for the {0} threshold: {1}".format(threshold, weight))
         parameters["weighted_angle"] = self.calculate_weighted_angles(thresholds, parameters['smoothed_angle'], threshold_weights)
 
         if self.do_velocity_filter:
@@ -1420,35 +1424,35 @@ class MLT_Analyser:
     def calculate_threshold_weights(self, thresholds):
         """
         Calculates the weighting value for each threshold using a bell curve weighting system.
-        Returns a dictionary mapping the threshold value to a specific weighting.
+        Returns a dictionary mapping each threshold value to a specific weighting.
         """
         num_thresholds = len(thresholds)
+        weight_map = {}
 
-        # Calculate the center threshold
-        center_threshold = np.mean(thresholds)
-
-        # Calculate standard deviation for Gaussian distribution
-        sigma = 0.4
-
-        # Initialize weights array
-        weights = np.zeros(num_thresholds)
-
-        # Calculate weights using Gaussian distribution
         for i, threshold in enumerate(thresholds):
-            weights[i] = np.exp(-(threshold - center_threshold)**2 / (2 * sigma**2))
+            # Calculate standard deviation for Gaussian distribution for this threshold
+            sigma = 0.05
 
-        # Normalize weights to sum up to 1
-        weights /= np.sum(weights)
+            # Initialize weights array
+            weights = np.zeros(num_thresholds)
 
-        # Map the threshold values to the weighting in a dictionary
-        weight_map = dict(zip(thresholds, weights))
+            # Calculate weights using Gaussian distribution
+            for j, other_threshold in enumerate(thresholds):
+                weights[j] = np.exp(-(other_threshold - threshold)**2 / (2 * sigma**2))
+
+            # Normalize weights to sum up to 1
+            weights /= np.sum(weights)
+
+            # Map the threshold values to the weighting in a dictionary
+            weight_map[threshold] = dict(zip(thresholds, weights))
+
         Logger.log("[MLT_Analysis - calculate_threshold_weights] - Threshold weights calculated: {0}".format(weight_map))
         return weight_map
-
+    """
     def calculate_weighted_angles(self, thresholds, angles, threshold_weights):
-        """
-        Calculates the weighted angles based on the provided angles and weights.
-        """
+        
+        Calculates the weighted angles based on the provided angles and weights for each threshold.
+        
         num_timestamps = len(angles)
         weighted_angles = []
 
@@ -1457,7 +1461,32 @@ class MLT_Analyser:
             weighted_angle = 0
             total_weight = 0
             for j, angle in enumerate(timestamp_angles):
-                weight = threshold_weights[thresholds[j]]
+                weight = threshold_weights[thresholds[j]][thresholds[j]] 
+                weighted_angle += angle * weight
+                total_weight += weight
+            if total_weight != 0:  # Check if total_weight is not zero before division
+                weighted_angle /= total_weight
+            else:
+                weighted_angle = np.nan
+            weighted_angles.append(weighted_angle)
+
+        return weighted_angles
+    """
+
+    def calculate_weighted_angles(self, thresholds, angles, threshold_weights):
+        """
+        Calculates the weighted angles based on the provided angles and weights for each threshold.
+        """
+        num_timestamps = len(angles)
+        num_thresholds = len(thresholds)
+        weighted_angles = []
+
+        for i in range(num_timestamps):
+            timestamp_angles = angles[i * num_thresholds : (i + 1) * num_thresholds]  # Get angles for the current timestamp
+            weighted_angle = 0
+            total_weight = 0
+            for j, angle in enumerate(timestamp_angles):
+                weight = threshold_weights[thresholds[j]][thresholds[j]]  # Get weight for current threshold
                 weighted_angle += angle * weight
                 total_weight += weight
             if total_weight != 0:  # Check if total_weight is not zero before division
