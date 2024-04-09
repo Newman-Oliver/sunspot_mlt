@@ -1440,9 +1440,6 @@ class MLT_Analyser:
             for j, other_threshold in enumerate(thresholds):
                 weights[j] = np.exp(-(other_threshold - threshold)**2 / (2 * sigma**2))
 
-            # Normalize weights to sum up to 1
-            weights /= np.sum(weights)
-
             # Map the threshold values to the weighting in a dictionary
             weight_map[threshold] = dict(zip(thresholds, weights))
 
