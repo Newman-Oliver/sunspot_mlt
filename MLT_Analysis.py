@@ -185,7 +185,8 @@ class MLT_Analyser:
         if self.colour_map_limits == 'dynamic':
             self.colour_map_limits = [min(thresholds) - 0.01, max(thresholds) + 0.03]
 
-        # Do Combo
+        # The start and stop dates are specified in the config file to enable selection of a subset of the data
+        # instead of the whole spot history. 
         start, stop = SpotTools.get_date_range_indices(sunspot_group, self.start_date, self.end_date)
         if start - self.velocity_stride < 0:
             start = 0
@@ -193,7 +194,8 @@ class MLT_Analyser:
             start -= self.velocity_stride
         # Calculate the weights here, now that thresholds has a value
         self.threshold_weights = self.calculate_threshold_weights(thresholds)
-        
+
+        # Determine plot type
         if self.graph_type == 'velocity_area_distribution':
             self.velocity_against_area_distribution(sunspot_group.history[start:stop], thresholds)
         elif self.graph_type == 'velocity_area':
@@ -770,30 +772,40 @@ class MLT_Analyser:
             velocity = angle_delta / time_delta
             interp_velocities.append(velocity)
         return interp_velocities
-
-    def get_weighted_angles(self,thresholds, angles, timestamp_list):
+    """
+    def get_weighted_angles(self, thresholds, angles, timestamp_list):
         num_timestamp = len(timestamp_list)
         num_angles = len(angles)
         num_thresholds = len(thresholds)
 
-        weighted_angles = np.zeros((num_timestamp, num_thresholds))
-        sigma = 0.01 # Standard Deviation
+        weighted_angles = np.zeros(num_timestamp)
 
+        # Calculate weights beforehand
+        weights = np.zeros((num_thresholds, num_angles))
+        sigma = 0.05
+    
+        for j in range(num_thresholds):
+            for k in range(num_angles):
+                threshold_index = k % num_thresholds
+                weights[j, k] = np.exp(-0.5 * (((thresholds[j] - thresholds[threshold_index]) / sigma) ** 2))
+
+        # Calculate weighted angles
         for i in range(num_timestamp):
+            a = 0
+            b = 0
             for j in range(num_thresholds):
-                a = 0
-                b = 0
                 for k in range(num_angles):
-                    threshold_index = k % num_thresholds
-                    a += angles[k] * np.exp(-0.5 * (((thresholds[j] - thresholds[threshold_index]) / sigma) ** 2))
-                    b += np.exp(-0.5 * (((thresholds[j] - thresholds[threshold_index]) / sigma) ** 2))
-                if b != 0:  # Check if b is not zero before division
-                    weighted_angle = a / b
-                else:
-                    weighted_angle = np.nan
-                weighted_angles[i, j] = weighted_angle
+                    a += angles[k] * weights[j, k]
+                    b += weights[j, k]
+                    if b != 0:  # Check if b is not zero before division
+                        weighted_angle = a / b
+                    else:
+                        weighted_angle = np.nan
+                    weighted_angles[i] = weighted_angle
+            a = 0
+            b = 0
         return weighted_angles
-
+    """
     def get_angular_velocity(self, timestamp_list, angle_list, delta_angles, stride):
         velocities = []
         if len(angle_list) < 11:
@@ -1003,6 +1015,15 @@ class MLT_Analyser:
                                                               self.velocity_stride, do_smooth=True,
                                                               abs_threshold=None)
         #parameters["weighted_angle"] = self.get_weighted_angles(thresholds, parameters['angle'], parameters['time'])
+
+        # new code - calculating weighted angle. 
+        threshold_weights = self.calculate_threshold_weights(thresholds)
+        print("Thresholds:", thresholds)
+        print("Smoothed angles:", parameters['smoothed_angle'])
+        for threshold, weight in threshold_weights.items():
+            print("Threshold weight for the {0} threshold: {1}".format(threshold, weight))
+        parameters["weighted_angle"] = self.calculate_weighted_angles(thresholds, parameters['smoothed_angle'], threshold_weights)
+
 
         if self.do_velocity_filter:
             parameters["interpolated_velocity"] = self.get_interpolated_velocity(parameters)
@@ -1407,20 +1428,76 @@ class MLT_Analyser:
 
     def calculate_threshold_weights(self, thresholds):
         """
-        Calculates the weighting value for each threshold. This determines how much the parametter values for 
-        different thresholds affect the overall average. Returns a dictionary mapping the threshold value to a 
-        specific weighting.
+        Calculates the weighting value for each threshold using a bell curve weighting system.
+        Returns a dictionary mapping each threshold value to a specific weighting.
         """
-        # You can add in whatever weighting function you want, as long as it returns as a 1d list.
-        # All equal weighting
-        weights = np.ones(len(thresholds))
-        # Linear (outer thresholds have more weight)
-        # weights = np.linspace(thresholds[0], thresholds[-1], num=len(thresholds))
+        num_thresholds = len(thresholds)
+        weight_map = {}
 
-        # Then map the threshold values to the weighting in a dict
-        weight_map = dict(zip(thresholds,weights))
+        for i, threshold in enumerate(thresholds):
+            # Calculate standard deviation for Gaussian distribution for this threshold
+            sigma = 0.05
+
+            # Initialize weights array
+            weights = np.zeros(num_thresholds)
+
+            # Calculate weights using Gaussian distribution
+            for j, other_threshold in enumerate(thresholds):
+                weights[j] = np.exp(-(other_threshold - threshold)**2 / (2 * sigma**2))
+
+            # Map the threshold values to the weighting in a dictionary
+            weight_map[threshold] = dict(zip(thresholds, weights))
+
         Logger.log("[MLT_Analysis - calculate_threshold_weights] - Threshold weights calculated: {0}".format(weight_map))
         return weight_map
+    """
+    def calculate_weighted_angles(self, thresholds, angles, threshold_weights):
+        
+        Calculates the weighted angles based on the provided angles and weights for each threshold.
+        
+        num_timestamps = len(angles)
+        weighted_angles = []
+
+        for i in range(num_timestamps):
+            timestamp_angles = [angles[i]]
+            weighted_angle = 0
+            total_weight = 0
+            for j, angle in enumerate(timestamp_angles):
+                weight = threshold_weights[thresholds[j]][thresholds[j]] 
+                weighted_angle += angle * weight
+                total_weight += weight
+            if total_weight != 0:  # Check if total_weight is not zero before division
+                weighted_angle /= total_weight
+            else:
+                weighted_angle = np.nan
+            weighted_angles.append(weighted_angle)
+
+        return weighted_angles
+    """
+
+    def calculate_weighted_angles(self, thresholds, angles, threshold_weights):
+        """
+        Calculates the weighted angles based on the provided angles and weights for each threshold.
+        """
+        num_timestamps = len(angles)
+        num_thresholds = len(thresholds)
+        weighted_angles = []
+
+        for i in range(num_timestamps):
+            timestamp_angles = angles[i * num_thresholds : (i + 1) * num_thresholds]  # Get angles for the current timestamp
+            weighted_angle = 0
+            total_weight = 0
+            for j, angle in enumerate(timestamp_angles):
+                weight = threshold_weights[thresholds[j]][thresholds[j]]  # Get weight for current threshold
+                weighted_angle += angle * weight
+                total_weight += weight
+            if total_weight != 0:  # Check if total_weight is not zero before division
+                weighted_angle /= total_weight
+            else:
+                weighted_angle = np.nan
+            weighted_angles.append(weighted_angle)
+
+        return weighted_angles
 
     def plot_average_parameter(self, plt, cluster_list, plot_type, plot_index):
         """A different implementation of plot_on_single_graph that allows for the average of parameters in different
