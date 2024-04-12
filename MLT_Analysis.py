@@ -1432,6 +1432,7 @@ class MLT_Analyser:
         Returns a dictionary mapping each threshold value to a specific weighting.
         """
         num_thresholds = len(thresholds)
+        # create a weight value for each threshold layer. 
         weight_map = {}
 
         for i, threshold in enumerate(thresholds):
@@ -1445,8 +1446,10 @@ class MLT_Analyser:
             for j, other_threshold in enumerate(thresholds):
                 weights[j] = np.exp(-(other_threshold - threshold)**2 / (2 * sigma**2))
 
-            # Map the threshold values to the weighting in a dictionary
-            weight_map[threshold] = dict(zip(thresholds, weights))
+            # get the average of the weighting to every other layer.
+            # in principle this does nothing when the thresholds
+            # are equally distributed. 
+            weight_map[threshold] = np.mean(weights)
 
         Logger.log("[MLT_Analysis - calculate_threshold_weights] - Threshold weights calculated: {0}".format(weight_map))
         return weight_map
@@ -1479,6 +1482,13 @@ class MLT_Analyser:
         """
         Calculates the weighted angles based on the provided angles and weights for each threshold.
         """
+        weighted_angles = []
+
+        for threshold, weight in threshold_weights.items():
+            if threshold in angles.keys():
+                weighted_angles.append(angles[threshold] * weight)
+
+        # remove below
         num_timestamps = len(angles)
         num_thresholds = len(thresholds)
         weighted_angles = []
