@@ -1478,13 +1478,15 @@ class MLT_Analyser:
         return weighted_angles
     """
 
-    def calculate_weighted_average(self, param_list, threshold_weights=self.threshold_weights):
+    def calculate_weighted_average(self, param_list, threshold_weights=None):
         """
         Calculates the weighted average on a list of parameters from the multi-parameter plot fucntion. 
 
         :param: param_list a list of tuples with the first element being threshold ratio, and the second value being parameter value.
         """
         weighted_values = []
+        if threshold_weights is None:
+            threshold_weights = self.threshold_weights
 
         for i in range(0,len(param_list)):
             try:
