@@ -1016,13 +1016,13 @@ class MLT_Analyser:
                                                               abs_threshold=None)
         #parameters["weighted_angle"] = self.get_weighted_angles(thresholds, parameters['angle'], parameters['time'])
 
-        # new code - calculating weighted angle. 
-        threshold_weights = self.calculate_threshold_weights(thresholds)
-        print("Thresholds:", thresholds)
-        print("Smoothed angles:", parameters['smoothed_angle'])
-        for threshold, weight in threshold_weights.items():
-            print("Threshold weight for the {0} threshold: {1}".format(threshold, weight))
-        parameters["weighted_angle"] = self.calculate_weighted_angles(thresholds, parameters['smoothed_angle'], threshold_weights)
+        # new code - calculating weighted angle per-spot. 
+        #threshold_weights = self.calculate_threshold_weights(thresholds)
+        #print("Thresholds:", thresholds)
+        #print("Smoothed angles:", parameters['smoothed_angle'])
+        #for threshold, weight in threshold_weights.items():
+        #    print("Threshold weight for the {0} threshold: {1}".format(threshold, weight))
+        #parameters["weighted_angle"] = self.calculate_weighted_angles(parameters['threshold_ratio'], parameters['smoothed_angle'], threshold_weights)
 
 
         if self.do_velocity_filter:
@@ -1478,36 +1478,24 @@ class MLT_Analyser:
         return weighted_angles
     """
 
-    def calculate_weighted_angles(self, thresholds, angles, threshold_weights):
+    def calculate_weighted_average(self, param_list, threshold_weights=self.threshold_weights):
         """
-        Calculates the weighted angles based on the provided angles and weights for each threshold.
+        Calculates the weighted average on a list of parameters from the multi-parameter plot fucntion. 
+
+        :param: param_list a list of tuples with the first element being threshold ratio, and the second value being parameter value.
         """
-        weighted_angles = []
+        weighted_values = []
 
-        for threshold, weight in threshold_weights.items():
-            if threshold in angles.keys():
-                weighted_angles.append(angles[threshold] * weight)
-
-        # remove below
-        num_timestamps = len(angles)
-        num_thresholds = len(thresholds)
-        weighted_angles = []
-
-        for i in range(num_timestamps):
-            timestamp_angles = angles[i * num_thresholds : (i + 1) * num_thresholds]  # Get angles for the current timestamp
-            weighted_angle = 0
-            total_weight = 0
-            for j, angle in enumerate(timestamp_angles):
-                weight = threshold_weights[thresholds[j]][thresholds[j]]  # Get weight for current threshold
-                weighted_angle += angle * weight
-                total_weight += weight
-            if total_weight != 0:  # Check if total_weight is not zero before division
-                weighted_angle /= total_weight
-            else:
-                weighted_angle = np.nan
-            weighted_angles.append(weighted_angle)
-
-        return weighted_angles
+        for i in range(0,len(param_list)):
+            try:
+                weighted_values.append(param_list[i][1] * threshold_weights[param_list[i][0]])
+            except KeyError as e:
+                Logger.log("[MLT_Analysis - calculate_weighted_average] Threshold value " +
+                            "\"{0}\" not found in threshold_weights dict!".format(param_list[i][0]))
+                raise e
+        Logger.debug("[MLT_Analysis - calculate_weighted_average] " +
+                            "weighted_values: {0}".format(weighted_values))
+        return np.mean(weighted_values)
 
     def plot_average_parameter(self, plt, cluster_list, plot_type, plot_index):
         """A different implementation of plot_on_single_graph that allows for the average of parameters in different
@@ -2196,11 +2184,19 @@ class MLT_Analyser:
                 if plot_type.startswith('avg_'):
                     colour_style = 'faded'
                     do_average_plot = True
+                    do_weighted_avg = False
+                    plot_type = plot_type[4:]
+                    parameters_for_average = {}
+                elif plot_type.startswith('wgt_'):
+                    colour_style = 'faded'
+                    do_average_plot = True
+                    do_weighted_avg = True
                     plot_type = plot_type[4:]
                     parameters_for_average = {}
                 else:
                     colour_style = 'normal'
                     do_average_plot = False
+                    do_weighted_avg = False
                 clusters_with_text_plotted = []
                 for k in range(0, len(thresholds)):
                     params = None
@@ -2222,12 +2218,15 @@ class MLT_Analyser:
                         Logger.debug("[MLT_Analysis - multi_parameter_plot] {0} for spot {1} at layer {2}: {3}".format(plot_type, spot_index, thresholds[k], params[plot_type]))
                         Logger.debug("[MLT_Analysis - multi_parameter_plot] raw_angles: {0}".format(params['raw_angle']))
                         if do_average_plot:
-                            # collect data, making sure every value is attributed to the correct timestamp
+                            # parameters_for_average is a dictionary of timestamps (keys) matched with a list of tuples of (threshold_ratio, value of plot_type at the timestamp for this threshold).
+                            # e.g. parameters_for_average = { 2014-01-01_00-00-00:[(0.55, 10), (0.50, 8), ... ], ... }
+                            # If a value for the plot_type at the current threshold doesn't have a value, nothing is added to the list. So while the values are added to the list in 
+                            # threshold order, there is no guarantee that all thresholds will appear at all timestamps.
                             for l in range(0,len(params['time'])):
                                 if params['time'][l] in parameters_for_average:
-                                    parameters_for_average[params['time'][l]].append(params[plot_type][l])
+                                    parameters_for_average[params['time'][l]].append((thresholds[k],params[plot_type][l]))
                                 else:
-                                    parameters_for_average[params['time'][l]] = [params[plot_type][l]]
+                                    parameters_for_average[params['time'][l]] = [(thresholds[k],params[plot_type][l])]
                     except KeyError:
                         Logger.debug("[MLT_Analysis - multi_parameter_plot]"
                                      + " No spot {0} at threshold {1}. Skipping...".format(spot_index, thresholds[k]))
@@ -2293,7 +2292,10 @@ class MLT_Analyser:
 
                 if do_average_plot:
                     for timestamp in parameters_for_average:
-                        parameters_for_average[timestamp] = np.mean(parameters_for_average[timestamp])
+                        if do_weighted_plot:
+                            parameters_for_average[timestamp] = self.calculate_weighted_average(parameters_for_average[timestamp])
+                        else:
+                            parameters_for_average[timestamp] = np.mean([element[1] for element in parameters_for_average[timestamp]])
                     # Ensure time order
                     parameters_for_average = dict(sorted(parameters_for_average.items(), key=lambda item: item[0]))
                     graphs[j].plot_date(parameters_for_average.keys(), list(parameters_for_average.values()),
